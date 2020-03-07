@@ -26,6 +26,7 @@
         /* W3C, IE 10+/ Edge, Firefox 16+, Chrome 26+, Opera 12+, Safari 7+ */
     }
 
+    
      .box{
         text-align: center;
         z-index: 0;
@@ -47,7 +48,7 @@
         }
     
     .login-form{
-        max-height: 700px;
+        max-height: 600px;
     }
 
  </style>
@@ -71,30 +72,22 @@
 <br>
 <br>
 
-<div class="row justify-content-center fluid-resposive">
-    <div class = "col-md-7 col-xs-0 ">
-        <img class = "img-front" src="{% static 'images/money.png' %}">
-    </div>
 
-    <div class="card login-form col-md-3 col-xs-10 col-offset-2 box">
+<div class="row justify-content-center fluid-resposive">
+
+    <div class="card login-form col-md-10 col-xs-10 col-offset-2 box">
         <br>
-        <h2>Register</h2>
+        <h2>Fill account details</h2>
         <br>
         <form method="post">
             {% csrf_token %}
             {{forms|crispy}}
-            
-            <button class = "btn btn-primary" type="submit">Register</button>
-            <br>
-            <br>
-            <a href = "{% url 'login' %}">Aldready have an account? Log in instead</a>
-            
+            <button class = "btn btn-primary" type="submit">Proceed</button>
         </form>
         <br>
-        <p><strong>-- OR --</strong></p>
-        <a class = "btn btn-outlinne" href="{% url 'social:begin' 'github' %}">Login with GitHub</a><br>
-          
     </div>
 </div>
+
+
 
 {% endblock %}

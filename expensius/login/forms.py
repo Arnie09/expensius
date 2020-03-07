@@ -2,10 +2,13 @@ from django import forms
 from django.contrib.auth import (
     authenticate,
     get_user_model
-
 )
 
 User = get_user_model()
+
+class AccountForm(forms.Form):
+    accountname = forms.CharField()
+    current_bal = forms.FloatField()
 
 class UserLoginForm(forms.Form):
     username = forms.CharField()

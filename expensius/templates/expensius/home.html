@@ -2,9 +2,135 @@
 
 {% load static %}
 {% block content %}
+<!-- js.cookie -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/js-cookie/2.2.1/js.cookie.js"></script>
 
-<h2>Homepage</h2>
-<p>Hello {{ user.username }}!</p>
-<a href = "{% url 'logout' %}">Logout</a>
+
+<nav class="navbar navbar-expand-lg navbar-light bg-light shadow" id="mainNav">
+    <div class="container-fluid">
+        <a class="navbar-brand" href="">Expensius</a>
+        <button class="navbar-toggler navbar-toggler-right" type="button" data-toggle="collapse" data-target="#navbarResponsive"
+            aria-controls="navbarResponsive" aria-expanded="false" aria-label="Toggle navigation">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse pull-right" id="navbarResponsive">
+            <ul class="navbar-nav mr-none">
+                <a class="nav-link text-black font-weight-bold" href= "">Hi,{{ user.username }}</a>    
+            </ul>
+            <ul class="navbar-nav mr-none">
+                <a class="nav-link text-black font-weight-bold" href="">About</a>
+            </ul>
+            <ul class="navbar-nav mr-none">
+                <a class="nav-link text-black font-weight-bold" href="{% url 'logout' %}">Logout</a>   
+            </ul>
+            
+        </div>
+    </div>
+</nav>
+<br>
+<br>
+
+<button type="button" class="btn btn-primary" data-toggle="modal" data-target="#ModalTransactionForm">
+    Launch demo modal
+</button>
+
+<!-- Modal HTML Markup -->
+<div id="ModalTransactionForm" class="modal fade">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h1 class="modal-title">Enter Transaction details</h1>
+            </div>
+            <div class="modal-body">
+                <form role="form" method="POST" action="">
+                    <input type="hidden" name="_token" value="">
+                    <div class="form-group">
+                        <label class="control-label">Amount</label>
+                        <div>
+                            <input id = "amount" type="number" class="form-control input-lg" name="amount" value="">
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label class="control-label">To/From</label>
+                        <div>
+                            <input id = "other" type="text" class="form-control input-lg" name="other">
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label class="control-label">Date</label>
+                        <div>
+                            <input id = "date" type="date" class="form-control input-lg" name="date">
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <div>
+                            <div class="checkbox">
+                                <label>
+                                    <input id = "direction" type="checkbox" name="direction"> Credit
+                                </label>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <div>
+                            <button class="btn btn-primary" id="enter" type="button" >Enter</button>{% csrf_token %}
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div><!-- /.modal-content -->
+    </div><!-- /.modal-dialog -->
+</div><!-- /.modal -->
+
+<script>
+
+    var result_section_open = false
+
+    //ajax csrf stuff which I dont understand.
+    var csrftoken = Cookies.get('csrftoken')
+    function csrfSafeMethod(method) {
+        return (/^(GET|HEAD|OPTIONS|TRACE)$/.test(method));
+    }
+    $.ajaxSetup({
+        beforeSend: function(xhr, settings) {
+            if (!csrfSafeMethod(settings.type) && !this.crossDomain) {
+                xhr.setRequestHeader("X-CSRFToken", csrftoken);
+            }
+        }
+    });
+
+    $(document).on('click','#enter',function(e){
+        e.preventDefault()
+            
+            var payload = {
+                amount: document.getElementById('amount').value,
+                other: document.getElementById('other').value,
+                direction: document.getElementById('direction').value,
+                date: document.getElementById('date').value
+            }
+            var amount = document.getElementById('amount').value;
+
+
+            $.ajax({
+                type:'POST',
+                url:'/add_transaction/',
+                data:{
+                    'payload':payload,
+                },
+                // This is processing of what we get back
+                success:function(msg){
+                    console.log(payload)
+                    // update list 
+                },
+                error:function(){
+                    console.log("Error")
+                }
+                
+            });
+        })
+
+</script>
+
+
 
 {% endblock %}
