@@ -40,12 +40,13 @@ class UserRegisterForm(forms.ModelForm):
             'password'
         ]
 
-    def clean_email(self,*args,**kwargs):
-        email = self.cleaned_data('email')
-        email2 = self.cleaned_data('email2')
+    def clean(self,*args,**kwargs):
+        email = self.cleaned_data.get('email')
+        email2 = self.cleaned_data.get('email2')
+        print(email,email2)
         if email != email2:
             raise forms.ValidationError("Emails must match")
-        email_qs = User.object.filter(email = email)
+        email_qs = User.objects.filter(email = email)
         if email_qs.exists():
             raise forms.ValidationError(
                 "this email is aldready being used"

@@ -39,8 +39,11 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'login',
-    'social_django'
+    'social_django',
+    'crispy_forms'
 ]
+
+CRISPY_TEMPLATE_PACK = 'bootstrap4'
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
@@ -144,9 +147,7 @@ SOCIAL_AUTH_GITHUB_SECRET = '6077edbb47aff81aa0613f6d816d61ec56352f38'
 
 STATIC_URL = '/static/'
 
-STATIC_ROOT = os.path.join(os.path.dirname(BASE_DIR), 'static')
-
-STATIC_DIRS = [
-    os.path.join(os.path.dirname(__file__) , 'static').replace('\\','/')
+STATICFILES_DIRS = [
+    STATIC_DIR,
 ]
 

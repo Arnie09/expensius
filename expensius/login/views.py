@@ -21,7 +21,7 @@ def login_view(request):
         username = form.cleaned_data.get('username')
         password = form.cleaned_data.get('password')
         user = authenticate(username = username, password = password)
-        login(request,user)
+        login(request,user,backend='django.contrib.auth.backends.ModelBackend')
         if next:
             return redirect(next)
         return redirect('/')
@@ -33,14 +33,14 @@ def login_view(request):
 
 def register_view(request):
     next = request.GET.get('next')
-    form = UserLoginForm(request.POST or None)
+    form = UserRegisterForm(request.POST or None)
     if form.is_valid():
         password = form.cleaned_data.get('password')
         user = form.save(commit = False)
         user.set_password(password)
         user.save()
         new_user = authenticate(username = user.username, password = password)
-        login(request,user)
+        login(request,user,backend='django.contrib.auth.backends.ModelBackend')
         if next:
             return redirect(next)
         return redirect('/')
