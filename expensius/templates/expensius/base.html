@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+{% load static %}
+<html>
+
+    <head>
+        <!-- <link rel="shortcut icon" href="{% static 'images/face.ico' %}" /> -->
+        <title>Expensius || A money tracker</title>
+        <link href="https://fonts.googleapis.com/css?family=Roboto:400,700" rel="stylesheet">
+        <meta name="google" content="notranslate" />
+        <meta name="viewport" content="width=device-width, initial-scale=1" />
+
+        <script src="https://code.jquery.com/jquery-3.4.1.slim.min.js" integrity="sha384-J6qa4849blE2+poT4WnyKhv5vZF5SrPo0iEjwBvKU7imGFAV0wwj1yYfoRSJoZ+n" crossorigin="anonymous"></script>
+        <script src="https://cdn.jsdelivr.net/npm/popper.js@1.16.0/dist/umd/popper.min.js" integrity="sha384-Q6E9RHvbIyZFJoft+2mJbHaEWldlvI9IOYy5n3zV9zzTtmI3UksdQRVvoxMfooAo" crossorigin="anonymous"></script>
+        <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js" integrity="sha384-JZR6Spejh4U02d8jOt6vLEHfe/JQGiRRSQQxSfFWpi1MquVdAyjUar5+76PVCmYl" crossorigin="anonymous"></script>
+        <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css" integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm" crossorigin="anonymous">
+       
+        <!-- Jquery -->
+        
+        <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
+        <script>
+            $( window ).on('load',function() {
+
+                if ($(window).height() > $('#content').height() + $('#navigation').height()) {
+                        $('.py-3 bg-grey').css({
+                            position: 'fixed',
+                            bottom: 0
+                        });
+                    }
+            });
+        </script>
+        
+    </head>
+
+    <body>
+        <style>
+            body {
+            font-family: "Roboto", sans-serif;
+            font-size: 17px;
+            background: #fd746c;  /* fallback for old browsers */
+            background: -webkit-linear-gradient(to right, #ff9068, #fd746c);  /* Chrome 10-25, Safari 5.1-6 */
+            background: linear-gradient(to right, #ff9068, #fd746c); /* W3C, IE 10+/ Edge, Firefox 16+, Chrome 26+, Opera 12+, Safari 7+ */
+            /* W3C, IE 10+/ Edge, Firefox 16+, Chrome 26+, Opera 12+, Safari 7+ */
+        }
+
+    </style>
+
+        <!-- Navigation -->
+        <nav class="navbar navbar-expand-lg navbar-light bg-light shadow" id="mainNav">
+            <div class="container-fluid">
+                <a class="navbar-brand" href="">Expensius</a>
+                <button class="navbar-toggler navbar-toggler-right" type="button" data-toggle="collapse" data-target="#navbarResponsive"
+                    aria-controls="navbarResponsive" aria-expanded="false" aria-label="Toggle navigation">
+                    <span class="navbar-toggler-icon"></span>
+                </button>
+                <div class="collapse navbar-collapse" id="navbarResponsive">
+                    <ul class="navbar-nav ml-auto">
+                        <li class="nav-item text-black">
+                            <a class="nav-link text-black font-weight-bold" href="">About</a>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </nav>
+        <br>
+        <br>
+        {% block content %}
+        <!-- Content Goes here -->
+        {% endblock content %}
+        <!-- Footer -->
+        <footer class="py-3 bg-grey">
+            <p class="m-0 text-dark text-center ">Copyright  {% now "Y" %} &copy;Arnab Chanda</p>
+        </footer>
+    </body>
+</html>

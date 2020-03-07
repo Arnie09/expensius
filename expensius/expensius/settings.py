@@ -14,7 +14,8 @@ import os
 
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-
+TEMP_DIR=os.path.join(BASE_DIR,'templates')
+STATIC_DIR=os.path.join(BASE_DIR,'static')
 
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/3.0/howto/deployment/checklist/
@@ -49,6 +50,7 @@ MIDDLEWARE = [
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
+     'social_django.middleware.SocialAuthExceptionMiddleware'
 ]
 
 ROOT_URLCONF = 'expensius.urls'
@@ -56,7 +58,7 @@ ROOT_URLCONF = 'expensius.urls'
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
-        'DIRS': [],
+        'DIRS': [TEMP_DIR],
         'APP_DIRS': True,
         'OPTIONS': {
             'context_processors': [
@@ -64,10 +66,20 @@ TEMPLATES = [
                 'django.template.context_processors.request',
                 'django.contrib.auth.context_processors.auth',
                 'django.contrib.messages.context_processors.messages',
+                'social_django.context_processors.backends',
+                'social_django.context_processors.login_redirect' 
             ],
         },
     },
 ]
+
+AUTHENTICATION_BACKENDS = (
+    'social_core.backends.github.GithubOAuth2',
+    'social_core.backends.twitter.TwitterOAuth',
+    'social_core.backends.facebook.FacebookOAuth2',
+
+    'django.contrib.auth.backends.ModelBackend',
+)
 
 WSGI_APPLICATION = 'expensius.wsgi.application'
 
@@ -77,8 +89,12 @@ WSGI_APPLICATION = 'expensius.wsgi.application'
 
 DATABASES = {
     'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': os.path.join(BASE_DIR, 'db.sqlite3'),
+        'ENGINE': 'django.db.backends.postgresql_psycopg2',
+        'NAME': 'expensius',
+        'USER': 'adminarnab',
+        'PASSWORD': 'Hello1234',
+        'HOST': 'localhost',
+        'PORT': '',
     }
 }
 
@@ -119,4 +135,18 @@ USE_TZ = True
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/3.0/howto/static-files/
 
+LOGIN_URL = 'login'
+LOGOUT_URL = 'logout'
+LOGIN_REDIRECT_URL = 'home'
+
+SOCIAL_AUTH_GITHUB_KEY = '446c53cae62661f3567f'
+SOCIAL_AUTH_GITHUB_SECRET = '6077edbb47aff81aa0613f6d816d61ec56352f38'
+
 STATIC_URL = '/static/'
+
+STATIC_ROOT = os.path.join(os.path.dirname(BASE_DIR), 'static')
+
+STATIC_DIRS = [
+    os.path.join(os.path.dirname(__file__) , 'static').replace('\\','/')
+]
+
