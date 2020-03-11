@@ -10,4 +10,4 @@ class Transaction(models.Model):
     direction = models.BooleanField() #True = debit False = credit
     date = models.DateTimeField()
     amount = models.FloatField()
-
+    amount_accnt = models.FloatField()

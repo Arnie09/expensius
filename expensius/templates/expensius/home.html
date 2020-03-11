@@ -2,11 +2,54 @@
 
 {% load static %}
 {% block content %}
+<!-- chart js  -->
+<script src="https://cdn.jsdelivr.net/npm/chart.js@2.9.3/dist/Chart.min.js"></script>
 <!-- js.cookie -->
 <script src="https://cdnjs.cloudflare.com/ajax/libs/js-cookie/2.2.1/js.cookie.js"></script>
 
+<style>
 
-<nav class="navbar navbar-expand-lg navbar-light bg-light shadow" id="mainNav">
+    .box{
+        text-align: center;
+        z-index: 0;
+        margin: 0 10px 0 10px;
+        box-shadow: 0 5px 15px 2px rgba(0, 0, 0, 0.15);
+    }
+
+    .box:hover{
+        box-shadow: 0 5px 15px 2px rgba(0, 0, 0, 0.2);
+        -webkit-transform: scale(1.005);
+        -ms-transform: scale(1.005);
+        transform: scale(1.005);
+        -webkit-transition: transform 0.2s ease-in-out;
+    }
+
+    .navbar{
+        background: #fd746c;  /* fallback for old browsers */
+        background: -webkit-linear-gradient(to right, #ff9068, #fd746c);  /* Chrome 10-25, Safari 5.1-6 */
+        background: linear-gradient(to right, #ff9068, #fd746c); /* W3C, IE 10+/ Edge, Firefox 16+, Chrome 26+, Opera 12+, Safari 7+ */
+        /* W3C, IE 10+/ Edge, Firefox 16+, Chrome 26+, Opera 12+, Safari 7+ */
+    }
+
+    .account-details{
+        height: 500px;
+    }
+
+    .h4{
+        margin: 10px;
+        margin-top: 50px;
+    }
+
+    .containerToHoldGraph{
+        background-color: white;
+        width: 1000px;
+        height: 400px;
+    }
+
+</style>
+
+<!-- navbar  -->
+<nav class="navbar navbar-expand-lg navbar-dark shadow" id="mainNav">
     <div class="container-fluid">
         <a class="navbar-brand" href="">Expensius</a>
         <button class="navbar-toggler navbar-toggler-right" type="button" data-toggle="collapse" data-target="#navbarResponsive"
@@ -30,9 +73,32 @@
 <br>
 <br>
 
-<button type="button" class="btn btn-primary" data-toggle="modal" data-target="#ModalTransactionForm">
-    Launch demo modal
-</button>
+<div class="row justify-content-center fluid-resposive">
+    <div class="col-md-11 account-details">
+        <div class = "row justify-content-center">
+            <div class="box col-md-3 col-xs-10 holds-dropdown">
+                <br>
+                <ul>
+                    <h4><b>Account details</b></h4>
+                    <h5>Account name: {{ account_name }}</h5>
+                    <h5>Current available balance: {{ account_bal }}</h5>
+
+                    <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#ModalTransactionForm">
+                        Enter a transaction
+                    </button>
+                </ul>
+            </div>
+            <div class="box col-md-8 col-xs-12 col-offset-2 right-side holds-graphs justify-content-center">
+                <div class="containerToHoldGraph">
+                    <canvas id="myChart" width="80" height = "30"></canvas>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+
 
 <!-- Modal HTML Markup -->
 <div id="ModalTransactionForm" class="modal fade">
@@ -82,9 +148,8 @@
     </div><!-- /.modal-dialog -->
 </div><!-- /.modal -->
 
+<!-- ajax funtion for transaction  -->
 <script>
-
-    var result_section_open = false
 
     //ajax csrf stuff which I dont understand.
     var csrftoken = Cookies.get('csrftoken')
@@ -105,7 +170,7 @@
             var payload = {
                 amount: document.getElementById('amount').value,
                 other: document.getElementById('other').value,
-                direction: document.getElementById('direction').value,
+                direction: document.getElementById('direction').checked,
                 date: document.getElementById('date').value
             }
             var amount = document.getElementById('amount').value;
@@ -131,6 +196,63 @@
 
 </script>
 
+<!-- chart showing rules -->
+<script>
+
+    var transaction_date = []
+    var amount = []
+    
+    {% for date in transaction_date %}
+        var dateObj = new Date('{{ date.isoformat }}')
+        var month = dateObj.getUTCMonth() + 1; //months from 1-12
+        var day = dateObj.getUTCDate();
+        var year = dateObj.getUTCFullYear();
+
+        var newdate = day + "/" + month + "/" + year;
+        transaction_date.push(newdate)
+    {% endfor %}
+    amount = {{transaction_history}}
+
+    var ctx = document.getElementById('myChart').getContext('2d');
+    var gradientStroke = ctx.createLinearGradient(500, 0, 400, 0);
+    gradientStroke.addColorStop(0, "#80b6f4");
+    gradientStroke.addColorStop(1, "#f49080");
+
+    var gradientFill = ctx.createLinearGradient(500, 0, 400, 0);
+    gradientFill.addColorStop(0, "rgba(128, 182, 244, 0.6)");
+    gradientFill.addColorStop(1, "rgba(244, 144, 128, 0.6)");
+
+    var list = {}
+    var myChart = new Chart(ctx, {
+        type: 'line',
+        data: {
+            labels: transaction_date,
+            datasets: [{
+                data: amount,
+                borderColor: gradientStroke,
+                pointBorderColor: gradientStroke,
+                pointBackgroundColor: gradientStroke,
+                pointHoverBackgroundColor: gradientStroke,
+                pointHoverBorderColor: gradientStroke,
+                backgroundColor:gradientFill,
+                pointBorderWidth: 10,
+                pointHoverRadius: 10,
+                pointHoverBorderWidth: 1,
+                pointRadius: 3,
+            }]
+        },
+        options: {
+            scales: {
+                yAxes: [{
+                    ticks: {
+                        beginAtZero: true
+                    }
+                }]
+            }
+        }
+    });
+    
+    </script>
 
 
 {% endblock %}
