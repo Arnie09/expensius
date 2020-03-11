@@ -16,7 +16,8 @@ def home(request):
     if transaction_objects == None:
         payload['transactions'] = -1
     else:
-        payload['transactions'] = len(transaction_objects)
+        payload['transactions_len'] = len(transaction_objects)
+        payload['transactions'] = transaction_objects
         payload['transaction_id'] = []
         payload['transaction_with'] = []
         payload['transaction_amt'] = []
@@ -35,7 +36,6 @@ def home(request):
     payload['account_bal'] = account_obj.available_bal
     payload['account_name'] = account_obj.account_name
 
-    print(transaction_objects)
     return render(request, 'expensius/home.html',payload)
 
 @login_required

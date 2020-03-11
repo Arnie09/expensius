@@ -32,7 +32,7 @@
     }
 
     .account-details{
-        height: 500px;
+        height: 700px;
     }
 
     .h4{
@@ -42,8 +42,14 @@
 
     .containerToHoldGraph{
         background-color: white;
-        width: 1000px;
-        height: 400px;
+        width: 1150px;
+        height: 600px;
+    }
+
+    canvas {
+        background-color: white; 
+        width: 100%;
+        height: auto;
     }
 
 </style>
@@ -73,6 +79,7 @@
 <br>
 <br>
 
+<!-- account details and chart  -->
 <div class="row justify-content-center fluid-resposive">
     <div class="col-md-11 account-details">
         <div class = "row justify-content-center">
@@ -88,16 +95,51 @@
                     </button>
                 </ul>
             </div>
-            <div class="box col-md-8 col-xs-12 col-offset-2 right-side holds-graphs justify-content-center">
+            <div class="box col-md-8 col-xs-12 right-side holds-graphs justify-content-center">
                 <div class="containerToHoldGraph">
-                    <canvas id="myChart" width="80" height = "30"></canvas>
+                    <canvas id="myChart"></canvas>
                 </div>
             </div>
         </div>
     </div>
 </div>
 
-
+<br>
+<!-- list of transactions  -->
+<div class="row justify-content-center fluid-resposive">
+    <div class="col-md-11 account-details">
+        <div class = "row justify-content-center">
+            <div class="box col-md-11 col-xs-10 holds-dropdown">
+                <br>
+                <ul>
+                    <h4><b>Transaction details</b></h4>
+                    <table class="table table-striped">
+                        <thead>
+                          <tr>
+                            <!-- <th scope="col">#</th> -->
+                            <th scope="col">Transaction Date</th>
+                            <th scope="col">Transaction with</th>
+                            <th scope="col">Transaction Amount</th>
+                            <th scope="col">CR/DB</th>
+                          </tr>
+                        </thead>
+                        {% for transaction in transactions %}
+                        <tbody>
+                          <tr>
+                            <!-- <th scope="row">{{ transaction.id }}</th> -->
+                            <td>{{transaction.date}}</td>
+                            <td>{{transaction.other}}</td>
+                            <td>{{transaction.amount}}</td>
+                            <td>{{transaction.direction}}</td>
+                          </tr>
+                        </tbody>
+                        {% endfor %}
+                    </table>
+                </ul>
+            </div>
+        </div>
+    </div>
+</div>
 
 
 <!-- Modal HTML Markup -->
@@ -147,6 +189,18 @@
         </div><!-- /.modal-content -->
     </div><!-- /.modal-dialog -->
 </div><!-- /.modal -->
+
+<script>
+    function convertTime(time){
+        var dateObj = new Date(time)
+        var month = dateObj.getUTCMonth() + 1; //months from 1-12
+        var day = dateObj.getUTCDate();
+        var year = dateObj.getUTCFullYear();
+
+        var newdate = day + "/" + month + "/" + year;
+        return newdate;
+    }
+</script>
 
 <!-- ajax funtion for transaction  -->
 <script>
@@ -214,6 +268,7 @@
     amount = {{transaction_history}}
 
     var ctx = document.getElementById('myChart').getContext('2d');
+
     var gradientStroke = ctx.createLinearGradient(500, 0, 400, 0);
     gradientStroke.addColorStop(0, "#80b6f4");
     gradientStroke.addColorStop(1, "#f49080");
