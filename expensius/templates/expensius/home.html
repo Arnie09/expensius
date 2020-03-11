@@ -40,10 +40,12 @@
         margin-top: 50px;
     }
 
-    .containerToHoldGraph{
+    .chart-container{
         background-color: white;
-        width: 1150px;
-        height: 600px;
+        position: relative;
+        margin: auto;
+        width: 60vw;
+        height: 60vh;
     }
 
     canvas {
@@ -111,29 +113,31 @@
         <br>
         <ul>
             <h4><b>Transaction details</b></h4>
-            <table class="table table-striped">
-                <thead>
-                    <tr>
-                    <!-- <th scope="col">#</th> -->
-                    <th scope="col">Transaction Date</th>
-                    <th scope="col">Transaction with</th>
-                    <th scope="col">Transaction Amount</th>
-                    <th scope="col">CR/DB</th>
-                    <th scope="col">Amount in accnt.</th>
-                    </tr>
-                </thead>
-                {% for transaction in transactions %}
-                <tbody>
-                    <tr>
-                    <td>{{transaction.date}}</td>
-                    <td>{{transaction.other}}</td>
-                    <td>{{transaction.amount}}</td>
-                    <td>{{transaction.direction}}</td>
-                    <td>{{transaction.amount_accnt}}</td>
-                    </tr>
-                </tbody>
-                {% endfor %}
-            </table>
+            <div class = "table-responsive">
+                <table class="table table-striped">
+                    <thead>
+                        <tr>
+                        <!-- <th scope="col">#</th> -->
+                        <th scope="col">Transaction Date</th>
+                        <th scope="col">Transaction with</th>
+                        <th scope="col">Transaction Amount</th>
+                        <th scope="col">CR/DB</th>
+                        <th scope="col">Amount in accnt.</th>
+                        </tr>
+                    </thead>
+                    {% for transaction in transactions %}
+                    <tbody>
+                        <tr>
+                        <td>{{transaction.date}}</td>
+                        <td>{{transaction.other}}</td>
+                        <td>{{transaction.amount}}</td>
+                        <td>{{transaction.direction}}</td>
+                        <td>{{transaction.amount_accnt}}</td>
+                        </tr>
+                    </tbody>
+                    {% endfor %}
+                </table>
+            </div>
         </ul>
     </div>
 </div>
@@ -287,8 +291,10 @@
     var myChart = new Chart(ctx, {
         type: 'line',
         data: {
+            
             labels: transaction_date,
             datasets: [{
+                label: "Amount of money over time",
                 data: amount,
                 borderColor: gradientStroke,
                 pointBorderColor: gradientStroke,
