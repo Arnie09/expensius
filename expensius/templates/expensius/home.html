@@ -96,7 +96,7 @@
                 </ul>
             </div>
             <div class="box col-md-8 col-xs-12 right-side holds-graphs justify-content-center">
-                <div class="containerToHoldGraph">
+                <div class="chart-container containerToHoldGraph">
                     <canvas id="myChart"></canvas>
                 </div>
             </div>
@@ -107,38 +107,34 @@
 <br>
 <!-- list of transactions  -->
 <div class="row justify-content-center fluid-resposive">
-    <div class="col-md-11 account-details">
-        <div class = "row justify-content-center">
-            <div class="box col-md-11 col-xs-10 holds-dropdown">
-                <br>
-                <ul>
-                    <h4><b>Transaction details</b></h4>
-                    <table class="table table-striped">
-                        <thead>
-                          <tr>
-                            <!-- <th scope="col">#</th> -->
-                            <th scope="col">Transaction Date</th>
-                            <th scope="col">Transaction with</th>
-                            <th scope="col">Transaction Amount</th>
-                            <th scope="col">CR/DB</th>
-                            <th scope="col">Amount in accnt.</th>
-                          </tr>
-                        </thead>
-                        {% for transaction in transactions %}
-                        <tbody>
-                          <tr>
-                            <td>{{transaction.date}}</td>
-                            <td>{{transaction.other}}</td>
-                            <td>{{transaction.amount}}</td>
-                            <td>{{transaction.direction}}</td>
-                            <td>{{transaction.amount_accnt}}</td>
-                          </tr>
-                        </tbody>
-                        {% endfor %}
-                    </table>
-                </ul>
-            </div>
-        </div>
+    <div class="box col-md-11 col-xs-10 holds-table">
+        <br>
+        <ul>
+            <h4><b>Transaction details</b></h4>
+            <table class="table table-striped">
+                <thead>
+                    <tr>
+                    <!-- <th scope="col">#</th> -->
+                    <th scope="col">Transaction Date</th>
+                    <th scope="col">Transaction with</th>
+                    <th scope="col">Transaction Amount</th>
+                    <th scope="col">CR/DB</th>
+                    <th scope="col">Amount in accnt.</th>
+                    </tr>
+                </thead>
+                {% for transaction in transactions %}
+                <tbody>
+                    <tr>
+                    <td>{{transaction.date}}</td>
+                    <td>{{transaction.other}}</td>
+                    <td>{{transaction.amount}}</td>
+                    <td>{{transaction.direction}}</td>
+                    <td>{{transaction.amount_accnt}}</td>
+                    </tr>
+                </tbody>
+                {% endfor %}
+            </table>
+        </ul>
     </div>
 </div>
 
@@ -239,7 +235,15 @@
                 },
                 // This is processing of what we get back
                 success:function(msg){
-                    console.log(payload)
+                    var response = msg['mssg']
+                    if(response == 1)
+                    alert('balance in account cannot be negetive, try again')
+                    else if(response == 2)
+                    alert('transaction date cannot be a future date, try again')
+                    else if(response == 3)
+                    alert('current transactions makes some of future transactions invalid')
+                    else if(response == 4)
+                    alert('transaction was successfully saved')
                     window.location.reload();
                     // update list 
                 },
