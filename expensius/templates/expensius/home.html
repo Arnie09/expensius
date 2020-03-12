@@ -114,7 +114,7 @@
         <ul>
             <h4><b>Transaction details</b></h4>
             <div class = "table-responsive">
-                <table class="table table-striped">
+                <table class="table table-striped" id = "table-transaction">
                     <thead>
                         <tr>
                         <!-- <th scope="col">#</th> -->
@@ -123,16 +123,18 @@
                         <th scope="col">Transaction Amount</th>
                         <th scope="col">CR/DB</th>
                         <th scope="col">Amount in accnt.</th>
+                        <th scope="col">ID</th>
                         </tr>
                     </thead>
                     {% for transaction in transactions %}
                     <tbody>
                         <tr>
-                        <td>{{transaction.date}}</td>
+                        <td>{{transaction.date|date}}</td>
                         <td>{{transaction.other}}</td>
                         <td>{{transaction.amount}}</td>
                         <td>{{transaction.direction}}</td>
                         <td>{{transaction.amount_accnt}}</td>
+                        <td>{{transaction.id}}</td>
                         </tr>
                     </tbody>
                     {% endfor %}
@@ -191,6 +193,63 @@
     </div><!-- /.modal-dialog -->
 </div><!-- /.modal -->
 
+<div id="myModalTransaction" class="modal fade">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h1 class="modal-title">Transaction</h1>
+            </div>
+            <div class="modal-body">
+                <form role="form" method="POST" action="">
+                    <input type="hidden" name="_token" value="">
+                    <div class = "form-group">
+                        <label class = "control-label">ID</label>
+                        <label id = "trans_id" class = "control-label"></label>
+                    </div>
+                    <div class="form-group">
+                        <label class="control-label">Amount</label>
+                        <div>
+                            <input id = "amount_trans" type="number" class="form-control input-lg" name="amount" value="">
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label class="control-label">To/From</label>
+                        <div>
+                            <input id = "other_trans" type="text" class="form-control input-lg" name="other">
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label class="control-label">Date</label>
+                        <div>
+                            <input id = "date_trans" type="date" class="form-control input-lg" name="date">
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <div>
+                            <div class="checkbox">
+                                <label>
+                                    <input id = "direction_trans" type="checkbox" name="direction"> Credit
+                                </label>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <div>
+                            <button class="btn btn-primary" id="Edit_transaction" type="button" >Edit</button>{% csrf_token %}
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <div>
+                            <button class="btn btn-danger" id="Delete_transaction" type="button" >Delete</button>{% csrf_token %}
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div><!-- /.modal-content -->
+    </div><!-- /.modal-dialog -->
+</div><!-- /.modal -->
+
 <script>
     function convertTime(time){
         var dateObj = new Date(time)
@@ -203,7 +262,48 @@
     }
 </script>
 
-<!-- ajax funtion for transaction  -->
+<script>
+    $("#table-transaction").click(function(){   
+        var t = document.getElementById('table-transaction');
+        var rows = t.rows; //rows collection - https://developer.mozilla.org/en-US/docs/Web/API/HTMLTableElement
+		for (var i=0; i<rows.length; i++) {
+			rows[i].onclick = function (event) {
+				//event = event || window.event; // for IE8 backward compatibility
+				//console.log(event, this, this.outerHTML);
+				if (this.parentNode.nodeName == 'THEAD') {
+					return;
+				}
+				var cells = this.cells; //cells collection
+				$("#myModalTransaction").modal('show')
+
+                var date_tran = document.getElementById('date_trans')
+				var date = new Date(cells[0].innerHTML);
+                date_tran.value = date.getFullYear().toString() + '-' + (date.getMonth() + 1).toString().padStart(2, 0) + '-' + date.getDate().toString().padStart(2, 0);
+
+                var with_tran = document.getElementById('other_trans')
+				with_tran.value = cells[1].innerHTML;
+
+                var amount_tran = document.getElementById('amount_trans')
+				amount_tran.value = cells[2].innerHTML;
+				
+                var dir_tran = document.getElementById('direction_trans')
+                var bool = cells[3].innerHTML;
+                if (bool == "True")
+                dir_tran.checked = true;
+                else
+                dir_tran.checked = false;
+
+                var id_tran = document.getElementById('trans_id')
+				id_tran.innerHTML = cells[5].innerHTML;
+
+                
+			};
+		}
+    });
+
+</script>
+
+<!-- ajax funtion for adding new transaction  -->
 <script>
 
     //ajax csrf stuff which I dont understand.
@@ -258,6 +358,88 @@
             });
         })
 
+</script>
+
+<!-- script for editing a record -->
+<script>
+    $(document).on('click','#Edit_transaction',function(e){
+        e.preventDefault()
+            
+            var payload = {
+                id: document.getElementById('trans_id').innerHTML,
+                amount: document.getElementById('amount_trans').value,
+                other: document.getElementById('other_trans').value,
+                direction: document.getElementById('direction_trans').checked,
+                date: document.getElementById('date_trans').value
+            }
+
+            $.ajax({
+                type:'POST',
+                url:'/edit_transaction/',
+                data:{
+                    'payload':payload,
+                },
+                // This is processing of what we get back
+                success:function(msg){
+                    var response = msg['mssg']
+                    if(response == 1)
+                    alert('balance in account cannot be negetive, try again')
+                    else if(response == 2)
+                    alert('transaction date cannot be a future date, try again')
+                    else if(response == 3)
+                    alert('current transactions makes some of future transactions invalid')
+                    else if(response == 4)
+                    alert('transaction was successfully saved')
+                    window.location.reload();
+                    // update list 
+                },
+                error:function(){
+                    console.log("Error")
+                }
+                
+            });
+    })
+</script>
+
+<!-- script for deleting transaction -->
+<script>
+$(document).on('click','#Delete_transaction',function(e){
+        e.preventDefault()
+            
+            var payload = {
+                id: document.getElementById('trans_id').innerHTML,
+                amount: document.getElementById('amount_trans').value,
+                other: document.getElementById('other_trans').value,
+                direction: document.getElementById('direction_trans').checked,
+                date: document.getElementById('date_trans').value
+            }
+
+            console.log(payload)
+
+            $.ajax({
+                type:'POST',
+                url:'/delete_transaction/',
+                data:{
+                    'payload':payload,
+                },
+                // This is processing of what we get back
+                success:function(msg){
+                    console.log(payload)
+                    var response = msg['mssg']
+                    
+                    if(response == 3)
+                    alert('deleting this transactions makes some of future transactions invalid')
+                    else if(response == 4)
+                    alert('transaction was successfully deleted')
+                    window.location.reload();
+                    // update list 
+                },
+                error:function(){
+                    console.log("Error")
+                }
+                
+            });
+        })
 </script>
 
 <!-- chart showing rules -->
