@@ -112,14 +112,13 @@ def add_transacton(request):
                     flag  = 1
                     Message = 2
                 else:
-                    last_balance_obj = Transaction.objects.filter(date__lte = given_date).order_by('date')[:1]
-                    print(last_balance_obj)
+                    last_balance_obj = Transaction.objects.filter(date__lte = given_date,account= user).order_by('-date')[:1]
                     last_balance = last_balance_obj[0].amount_accnt
                     if last_balance+change<0:
                         flag = 1
                         Message = 1
                     else:
-                        transaction_set = Transaction.objects.filter(date__gt = given_date,date__lte = current_date).order_by('date')
+                        transaction_set = Transaction.objects.filter(date__gt = given_date,date__lte = current_date,account = user).order_by('date')
                         flag2 = 0
                         for transaction in transaction_set:
                             amt = transaction.amount_accnt
@@ -166,73 +165,10 @@ def add_transacton(request):
             account_obj.save()
 
         response = {
-            'mssg':Message\
+            'mssg':Message
         }
         return JsonResponse(response)
 
-
-
-
-        # last_inserted_date = Transaction.objects.latest('date')
-        # print(last_inserted_date)
-        # if last_inserted_date == None:
-        #     print("No transactions")
-
-        # previous_transaction = Transaction.objects.filter(date__lte = given_date).order_by('date')[:1]
-        # previous_balance = 0 
-        # print(previous_transaction)
-        # if len(previous_transaction) == 0:
-        #     previous_balance = current_bal
-        # else:
-        #     previous_balance = previous_transaction.amount_accnt
-
-
-        # elif given_date > current_date:
-        #     #error, date cannot be a future date
-        #     Message = 2
-        # else:
-        #     transaction_set = Transaction.objects.filter(date__gt = given_date,date__lte = current_date).order_by('date')
-        #     flag = 0
-            
-        #     for transaction in transaction_set:
-        #         amt = transaction.amount_accnt
-        #         new_amt = amt+change
-        #         if new_amt<0:
-        #             Message = 3
-        #             flag = 1
-        #             break
-
-        #     if flag == 0:
-    
-        #         if direction == 'true':
-        #             direction = True
-        #         elif direction == 'false':
-        #             direction = False
-
-        #         Transaction.objects.create(
-        #             account = user,
-        #             other = request.POST.get('payload[other]'),
-        #             direction = direction,
-        #             amount = amount,
-        #             date = request.POST.get('payload[date]'),
-        #             amount_accnt = previous_balance+change
-        #             )
-
-        #         if len(transaction_set) == 0:
-        #             account_obj.available_bal+=change
-        #             account_obj.save()
-        #         Message = 4
-        #         LAST = None
-        #         for transaction in transaction_set:
-        #             transaction.amount_accnt += change
-        #             LAST = transaction.amount_accnt
-        #             transaction.save()
-        #         account_obj.available_bal = LAST
-        #         account_obj.save()
-        # response = {
-        #     'mssg':Message
-        # }
-        # return JsonResponse(response)
     return redirect('/')
 
 @login_required
@@ -244,27 +180,49 @@ def delete_transaction(request):
         id_tran = request.POST.get('payload[id]') 
         direction = request.POST.get('payload[direction]')
         amount = request.POST.get('payload[amount]')
-        print(amount)
         given_date = parse(request.POST.get('payload[date]')).date()
         current_date = date.today()
         mapper = {'false':-1,'true':1}
         change = mapper[direction]*float(amount)
 
-        transaction_set = Transaction.objects.filter(date__gt = given_date,date__lte = current_date).order_by('date')
+        account_obj = Account.objects.get(username = user)
+        last_balance = None
         flag = 0
-        for transaction in transaction_set:
-            amt = transaction.amount_accnt
-            new_amt = amt-change
-            if new_amt<0:
-                Message = 3
-                flag = 1
-                break
+        update_future = False
+        transaction_set = None
+        # This is for the situation when the user selects the last transaction of the user 
+        if account_obj.last_trans == given_date:
+            # Here two cases arise 
+                # when the last transaction is also the first transaction 
+                # and when the last transaction is not the first transaction
 
-        if flag == 0:
-            Transaction.objects.filter(id=id_tran).delete()
-            for transaction in transaction_set:
-                    transaction.amount_accnt -= change
-                    transaction.save()
+            previous_tran_obj = Transaction.objects.filter(date__lte = given_date, account = user).order_by('-date')[:2]
+            if len(previous_tran_obj)>1:
+                account_obj.available_bal = previous_tran_obj[1].amount_accnt
+                account_obj.last_trans = previous_tran_obj[1].date
+                account_obj.save()
+                Message = 4
+                Transaction.objects.filter(id=id_tran).delete()
+            elif len(previous_tran_obj) == 1:
+                account_obj.available_bal -= change
+                account_obj.last_trans = None
+                account_obj.has_trans = False
+                account_obj.save()
+                Message = 4
+                Transaction.objects.filter(id = id_tran).delete()
+
+
+        # This is for when the user will select a transaction of the user which any but the last transaction 
+        else:
+            Transaction.objects.filter(id = id_tran).delete()
+            future_tran_obj = Transaction.objects.filter(date__gte = given_date, account = user)
+            LAST = None
+            for transaction in future_tran_obj:
+                transaction.amount_accnt -= change
+                LAST = transaction.amount_accnt
+                transaction.save()
+            account_obj.available_bal = LAST
+            account_obj.save()
             Message = 4
 
         response = {
@@ -272,6 +230,7 @@ def delete_transaction(request):
         }
         return JsonResponse(response)
 
+        
     return redirect('/')
 
 @login_required
