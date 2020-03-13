@@ -7,6 +7,7 @@ from datetime import date
 from dateutil.parser import parse
 
 # Create your views here.
+response = {}
 
 @login_required
 def home(request):
@@ -240,6 +241,35 @@ def delete_transaction(request):
 
 @login_required
 def edit_transaction(request):
-    delete_transaction(request)
-    add_transacton(request)
+
+    if request.method == "POST":
+        delete_transaction(request)
+        return add_transacton(request)
+        # global response
+        # return JsonResponse(response)
+
+    return redirect('/')
+
+@login_required
+def delete_all_transaction(request):
+    
+    if request.method == "POST":
+        Message = None
+        password = request.POST.get('payload[password]')
+        user = request.user
+        if user.check_password(password):
+            Account.objects.filter(username = user).delete()
+            transactions = Transaction.objects.filter(account = user)
+            for transaction in transactions:
+                transaction.delete()
+            Message = 2
+        else:
+            Message = 1
+        
+        response = {
+            'mssg':Message
+        }
+
+        return JsonResponse(response)
+
     return redirect('/')

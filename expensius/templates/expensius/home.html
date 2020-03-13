@@ -95,6 +95,12 @@
                     <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#ModalTransactionForm">
                         Enter a transaction
                     </button>
+                    <br>
+                    <br>
+                    <button type="button" class="btn btn-danger" data-toggle="modal" data-target="#ModalTransactionDeleteForm">
+                        Delete all transactions
+                    </button>
+
                 </ul>
             </div>
             <div class="box col-md-8 col-xs-12 right-side holds-graphs justify-content-center">
@@ -113,6 +119,7 @@
         <br>
         <ul>
             <h4><b>Transaction details</b></h4>
+            <h6><i>Click on a transaction to select it</i></h6>
             <div class = "table-responsive">
                 <table class="table table-striped" id = "table-transaction">
                     <thead>
@@ -143,6 +150,34 @@
         </ul>
     </div>
 </div>
+
+<div id="ModalTransactionDeleteForm" class="modal fade">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Are you sure you want to delete all transactions?</h5>
+            </div>
+            <div class="modal-body">
+                <form role="form" method="POST" action="">
+                    <input type="hidden" name="_token" value="">
+                    <div class="form-group">
+                        <label class="control-label">Enter your account password</label>
+                        <div>
+                            <input id = "password_confirm" type="password" class="form-control input-lg" name="amount" value="">
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <div>
+                            <button class="btn btn-danger" id="confirm_delete" type="button" >Confirm</button>{% csrf_token %}
+                            <button type="button" class="btn btn-primary" data-dismiss="modal">Close</button>
+
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div><!-- /.modal-content -->
+    </div><!-- /.modal-dialog -->
+</div><!-- /.modal -->
 
 
 <!-- Modal HTML Markup -->
@@ -193,6 +228,7 @@
     </div><!-- /.modal-dialog -->
 </div><!-- /.modal -->
 
+<!-- modal that shows the transaction that was clicked -->
 <div id="myModalTransaction" class="modal fade">
     <div class="modal-dialog" role="document">
         <div class="modal-content">
@@ -233,15 +269,11 @@
                             </div>
                         </div>
                     </div>
-                    <div class="form-group">
+                    <div class="modal-footer">
                         <div>
                             <button class="btn btn-primary" id="Edit_transaction" type="button" >Edit</button>{% csrf_token %}
-                        </div>
-                    </div>
-
-                    <div class="form-group">
-                        <div>
                             <button class="btn btn-danger" id="Delete_transaction" type="button" >Delete</button>{% csrf_token %}
+                            <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
                         </div>
                     </div>
                 </form>
@@ -262,6 +294,7 @@
     }
 </script>
 
+<!-- script that selects the row of data that the user has clicked on -->
 <script>
     $("#table-transaction").click(function(){   
         var t = document.getElementById('table-transaction');
@@ -360,6 +393,42 @@
 
 </script>
 
+<!-- ajax script to delete all transactions -->
+<script>
+    $(document).on('click','#confirm_delete',function(e){
+        e.preventDefault()
+            
+            var payload = {
+                password: document.getElementById('password_confirm').value,
+            }
+
+            $.ajax({
+                type:'POST',
+                url:'/delete_all_transaction/',
+                data:{
+                    'payload':payload,
+                },
+                // This is processing of what we get back
+                success:function(msg){
+                    var response = msg['mssg']
+                    if(response == 1){
+                        alert("Password entered for the user is incorrect!")
+                        window.location.reload();
+                    }
+                    else if(response == 2){
+                        alert("Successfully deleted all your transactions and deleted your account!")
+                        window.location.href = "{% url 'account'%}";
+                    }
+                    // update list 
+                },
+                error:function(){
+                    console.log("Error")
+                }
+                
+            });
+    })
+</script>
+
 <!-- script for editing a record -->
 <script>
     $(document).on('click','#Edit_transaction',function(e){
@@ -389,7 +458,7 @@
                     else if(response == 3)
                     alert('current transactions makes some of future transactions invalid')
                     else if(response == 4)
-                    alert('transaction was successfully saved')
+                    alert('transaction was successfully edited and saved')
                     window.location.reload();
                     // update list 
                 },
