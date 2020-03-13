@@ -54,6 +54,7 @@ def add_transacton(request):
         given_date = parse(request.POST.get('payload[date]')).date()
         current_date = date.today()
         mapper = {'false':-1,'true':1}
+        mapper2 = {False:-1,True:1}
         change = mapper[direction]*float(amount)
 
         account_obj = Account.objects.get(username = user)
@@ -113,7 +114,11 @@ def add_transacton(request):
                     Message = 2
                 else:
                     last_balance_obj = Transaction.objects.filter(date__lte = given_date,account= user).order_by('-date')[:1]
-                    last_balance = last_balance_obj[0].amount_accnt
+                    if (len(last_balance_obj) == 0):
+                        future = Transaction.objects.filter(date__gte = given_date).order_by('date')[:1]
+                        last_balance = future[0].amount_accnt - future[0].amount*mapper2[future[0].direction]
+                    else:
+                        last_balance = last_balance_obj[0].amount_accnt
                     if last_balance+change<0:
                         flag = 1
                         Message = 1
@@ -178,11 +183,11 @@ def delete_transaction(request):
         Message = ""
         user = request.user
         id_tran = request.POST.get('payload[id]') 
-        direction = request.POST.get('payload[direction]')
-        amount = request.POST.get('payload[amount]')
-        given_date = parse(request.POST.get('payload[date]')).date()
+        direction = Transaction.objects.filter(id = id_tran)[0].direction
+        amount = Transaction.objects.filter(id = id_tran)[0].amount
+        given_date = Transaction.objects.filter(id = id_tran)[0].date.date()
         current_date = date.today()
-        mapper = {'false':-1,'true':1}
+        mapper = {False:-1,True:1}
         change = mapper[direction]*float(amount)
 
         account_obj = Account.objects.get(username = user)
@@ -235,4 +240,6 @@ def delete_transaction(request):
 
 @login_required
 def edit_transaction(request):
+    delete_transaction(request)
+    add_transacton(request)
     return redirect('/')
