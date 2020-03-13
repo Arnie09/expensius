@@ -69,7 +69,7 @@
                 <a class="nav-link text-black font-weight-bold" href= "">Hi,{{ user.username }}</a>    
             </ul>
             <ul class="navbar-nav mr-none">
-                <a class="nav-link text-black font-weight-bold" href="">About</a>
+                <a class="nav-link text-black font-weight-bold" href="{% url 'about' %}">About</a>
             </ul>
             <ul class="navbar-nav mr-none">
                 <a class="nav-link text-black font-weight-bold" href="{% url 'logout' %}">Logout</a>   

@@ -59,13 +59,18 @@ def account_info(request):
         last_trans_date = None
         Account.objects.create(username=user, account_name=accnt_name, available_bal=available_bal, has_trans = has_transaction, last_trans = last_trans_date)
         # Account.objects.create(username=user, account_name=accnt_name, available_bal=available_bal)
-        return redirect('/')
+        return redirect('about')
 
     context = {
         'forms':form
     }
     return render(request, 'expensius/fillaccnt.html',context)
 
+@login_required
 def logout_view(request):
     logout(request)
     return redirect('/')
+
+def about(request):
+
+    return render(request, 'expensius/about.html')

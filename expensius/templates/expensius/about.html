@@ -26,10 +26,12 @@
         /* W3C, IE 10+/ Edge, Firefox 16+, Chrome 26+, Opera 12+, Safari 7+ */
     }
 
+    
      .box{
         text-align: center;
         z-index: 0;
         margin: 0 10px 0 10px;
+        height: fit-content;
         box-shadow: 0 5px 15px 2px rgba(0, 0, 0, 0.15);
     }
 
@@ -41,17 +43,16 @@
         -webkit-transition: transform 0.2s ease-in-out;
     }
 
-    .img-front{
-            width: 80%;
-            height: 80%;
-        }
-    
-    .login-form{
-        max-height: 700px;
+    .list{
+        text-align: left;
+        margin: auto;
     }
+    
+
 
  </style>
 
+<!-- navbar -->
 <nav class="navbar navbar-expand-lg navbar-light bg-light shadow" id="mainNav">
     <div class="container-fluid">
         <a class="navbar-brand" href="">Expensius</a>
@@ -62,7 +63,7 @@
         <div class="collapse navbar-collapse" id="navbarResponsive">
             <ul class="navbar-nav ml-auto">
                 <li class="nav-item text-black">
-                    <a class="nav-link text-black font-weight-bold" href="{% url 'about' %}">About</a>
+                    <a class="nav-link text-black font-weight-bold" href="">About</a>
                 </li>
             </ul>
         </div>
@@ -72,29 +73,45 @@
 <br>
 
 <div class="row justify-content-center fluid-resposive">
-    <div class = "col-md-7 col-xs-0 ">
-        <img class = "img-front" src="{% static 'images/money.png' %}">
-    </div>
 
-    <div class="card login-form col-md-3 col-xs-10 col-offset-2 box">
+    <div class="card login-form col-md-5 col-xs-10 box">
         <br>
-        <h2>Register</h2>
+        <h2>What is Expensius?</h2>
         <br>
-        <form method="post">
-            {% csrf_token %}
-            {{forms|crispy}}
-            
-            <button class = "btn btn-primary" type="submit">Register</button>
-            <br>
-            <br>
-            <a href = "{% url 'login' %}">Aldready have an account? Log in instead</a>
-            
-        </form>
-        <br>
-        <p><strong>-- OR --</strong></p>
-        <a class = "btn btn-outlinne" href="{% url 'social:begin' 'github' %}">Login with GitHub</a><br>
-          
+        <!-- <div class = "list-parent col-md-5 justify-content-center"></div> -->
+            <p>
+                Expensius is monetary control platform that helps you track your monney and how you 
+                spend the money. Currently its a product in development!
+
+                Here are how you are going to work with this tool: 
+
+            </p>
+                    <ul class = "list col-md-10 ">
+                        <li>
+                            Currently you have given your account a name and entered a starting amount that your acccount has.
+                        </li>
+
+                        <li>
+                            Next you can add your daily transactions and monitor them. 
+                        </li>
+
+                        <li>
+                            You can delete, or modify any transactions in your account... remember that if you modify/change a transaction of the past it will affect all fututre transactions
+                        </li>
+
+                        <li>
+                            At no time, can the money in your account be <b>negetive</b>.
+                        </li>
+
+                        <li>
+                            You cannot enter a <b>future transaction</b> into the system
+                        </li>
+                    </ul>
+                <br>
+                <a type = "button" class = "btn btn-primary btn-arrow-right" href = "{% url 'home' %}" >Understood!</a>
+                <br>
+
+        <!-- </div> -->
     </div>
 </div>
-
 {% endblock %}
