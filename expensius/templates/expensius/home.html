@@ -31,6 +31,17 @@
         /* W3C, IE 10+/ Edge, Firefox 16+, Chrome 26+, Opera 12+, Safari 7+ */
     }
 
+    .navbar-brand{
+        color: white !important;
+        font-weight: bolder !important;
+    }
+
+    .nav-link{
+        color: white !important;
+        font-weight:100 !important;
+        align-self: end;
+    }
+
     .account-details{
         height: 700px;
     }
@@ -54,6 +65,10 @@
         height: auto;
     }
 
+    .mr-auto {
+        margin-right: 0 !important;
+    }
+
 </style>
 
 <!-- navbar  -->
@@ -65,13 +80,13 @@
             <span class="navbar-toggler-icon"></span>
         </button>
         <div class="collapse navbar-collapse pull-right" id="navbarResponsive">
-            <ul class="navbar-nav mr-none">
+            <ul class="navbar-nav ml-auto">
                 <a class="nav-link text-black font-weight-bold" href= "">Hi,{{ user.username }}</a>    
             </ul>
-            <ul class="navbar-nav mr-none">
+            <ul class="navbar-nav ml-none">
                 <a class="nav-link text-black font-weight-bold" href="{% url 'about' %}">About</a>
             </ul>
-            <ul class="navbar-nav mr-none">
+            <ul class="navbar-nav ml-none">
                 <a class="nav-link text-black font-weight-bold" href="{% url 'logout' %}">Logout</a>   
             </ul>
             
@@ -91,7 +106,7 @@
                     <h4><b>Account details</b></h4>
                     <h5>Account name: {{ account_name }}</h5>
                     <h5>Current available balance: {{ account_bal }}</h5>
-
+                    <br>
                     <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#ModalTransactionForm">
                         Enter a transaction
                     </button>
