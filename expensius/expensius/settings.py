@@ -26,7 +26,10 @@ SECRET_KEY = '-&@5j^2mlj5e)(j+9uf=*&8hi60lbod+w%bdr7#&)g*^h+a$p)'
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = [
+    '127.0.0.1',
+    'expensius.herokuapp.com',
+]
 
 
 # Application definition
@@ -47,6 +50,7 @@ INSTALLED_APPS = [
 CRISPY_TEMPLATE_PACK = 'bootstrap4'
 
 MIDDLEWARE = [
+    'whitenoise.middleware.WhiteNoiseMiddleware',
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
@@ -148,8 +152,15 @@ SOCIAL_AUTH_GITHUB_SECRET = '6077edbb47aff81aa0613f6d816d61ec56352f38'
 
 STATIC_URL = '/static/'
 
+STATIC_ROOT = os.path.join(os.path.dirname(BASE_DIR), 'static')
+
 STATICFILES_DIRS = [
     STATIC_DIR,
 ]
 
-STATICFILES_STORAGE = 'whitenoise.django.GzipManifestStaticFilesStorage'
+
+STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
+
+import dj_database_url 
+prod_db  =  dj_database_url.config(conn_max_age=500)
+DATABASES['default'].update(prod_db)

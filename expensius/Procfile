@@ -1,0 +1,1 @@
+web: gunicorn expensius.wsgi --log-file -
