@@ -1,0 +1,33 @@
+Profile: 
+
+    - Account User(One to One)
+    - Profile ID
+    - Number of accounts
+
+Account(an extension of User): 
+
+    - Account id - Unique ID
+    - user - User object
+    - account_name - text
+    - available balance at a given moment
+    - has_transaction boolean field 
+    - last transaction - transaction model data
+    - number of transactions default will be 0
+
+
+Transactions: 
+
+    - id
+    - account - Account mode data
+    - other person to do transaction with
+    - direction
+    - date
+    - amount
+    - amount accnt
+
+
+profile ----> Account1 ----> Transaction1, Transaction4.
+        |                   
+        ----> Account2 ----> Transaction2, Transaction5.
+        |
+        ____> Account3 ----> Transaction3, Transaction6.

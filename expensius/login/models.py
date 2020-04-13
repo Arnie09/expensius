@@ -8,3 +8,4 @@ class Account(models.Model):
     available_bal = models.FloatField(default=0)
     has_trans = models.BooleanField(null = True)
     last_trans = models.DateField(null = True)
+    num_bal = models.IntegerField(default=0)

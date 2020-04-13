@@ -57,7 +57,13 @@ def account_info(request):
         available_bal = form.cleaned_data.get('current_bal')
         has_transaction = False
         last_trans_date = None
-        Account.objects.create(username=user, account_name=accnt_name, available_bal=available_bal, has_trans = has_transaction, last_trans = last_trans_date)
+        Account.objects.create(
+            username=user,
+            account_name=accnt_name,
+            available_bal=available_bal,
+            has_trans = has_transaction,
+            last_trans = last_trans_date
+            )
         # Account.objects.create(username=user, account_name=accnt_name, available_bal=available_bal)
         return redirect('about')
 
