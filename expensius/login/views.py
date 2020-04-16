@@ -7,7 +7,7 @@ from django.contrib.auth import (
     login,
     logout
 )
-from .models import Account
+from .models import Account, Profile
 
 from .forms import UserLoginForm, UserRegisterForm, AccountForm
 
@@ -39,6 +39,9 @@ def register_view(request):
         user.save()
         new_user = authenticate(username = user.username, password = password)
         login(request,user,backend='django.contrib.auth.backends.ModelBackend')
+        Profile.objects.create(
+            user = user,
+        )
         if next:
             return redirect(next)
         return redirect('account/')
@@ -53,18 +56,21 @@ def account_info(request):
     form = AccountForm(request.POST or None)
     if form.is_valid():
         user = request.user
+        profile = Profile.objects.filter(user = user)[0]
         accnt_name = form.cleaned_data.get('accountname')
         available_bal = form.cleaned_data.get('current_bal')
         has_transaction = False
         last_trans_date = None
         Account.objects.create(
-            username=user,
+            username=profile,
             account_name=accnt_name,
             available_bal=available_bal,
             has_trans = has_transaction,
             last_trans = last_trans_date
             )
-        # Account.objects.create(username=user, account_name=accnt_name, available_bal=available_bal)
+        profile.noAccount+=1
+        profile.save()
+
         return redirect('about')
 
     context = {
@@ -72,11 +78,12 @@ def account_info(request):
     }
     return render(request, 'expensius/fillaccnt.html',context)
 
+# function that renders logout view
 @login_required
 def logout_view(request):
     logout(request)
     return redirect('/')
 
+# function that renders the about page
 def about(request):
-
     return render(request, 'expensius/about.html')

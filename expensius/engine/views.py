@@ -1,7 +1,7 @@
 from django.shortcuts import render,redirect
 from django.contrib.auth.decorators import login_required
 from .models import Transaction
-from login.models import Account
+from login.models import Account, Profile
 from django.http import JsonResponse
 from datetime import date
 from dateutil.parser import parse
@@ -12,8 +12,9 @@ response = {}
 @login_required
 def home(request):
     user = request.user
-    account_obj = Account.objects.get(username = user)
-    transaction_objects = Transaction.objects.filter(account = user).order_by('date')[:50]
+    profile_obj = Profile.objects.get(user = user)
+    account_default = Account.objects.get(username = profile_obj)
+    transaction_objects = Transaction.objects.filter(account = account_default).order_by('date')[:50]
     
     payload = {}
 
@@ -30,15 +31,15 @@ def home(request):
         payload['transaction_history'] = []
 
         for transaction in transaction_objects:
-            payload['transaction_id'].append(str(transaction.id))
+            payload['transaction_id'].append(str(transaction.transactionID))
             payload['transaction_with'].append(transaction.other)
             payload['transaction_amt'].append(transaction.amount)
             payload['transaction_date'].append(transaction.date)
             payload['transaction_direction'].append(transaction.direction)
             payload['transaction_history'].append(transaction.amount_accnt)
 
-    payload['account_bal'] = account_obj.available_bal
-    payload['account_name'] = account_obj.account_name
+    payload['account_bal'] = account_default.available_bal
+    payload['account_name'] = account_default.account_name
 
     return render(request, 'expensius/home.html',payload)
 
@@ -57,8 +58,8 @@ def add_transacton(request):
         mapper = {'false':-1,'true':1}
         mapper2 = {False:-1,True:1}
         change = mapper[direction]*float(amount)
-
-        account_obj = Account.objects.get(username = user)
+        profile = Profile.objects.get(user = user)
+        account_obj = Account.objects.get(username = profile)
         last_balance = None
         flag = 0
         update_future = False
@@ -147,7 +148,7 @@ def add_transacton(request):
                 direction = False
 
             Transaction.objects.create(
-                account = user,
+                account = account_obj,
                 other = request.POST.get('payload[other]'),
                 direction = direction,
                 amount = amount,
