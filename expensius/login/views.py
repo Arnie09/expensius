@@ -8,6 +8,8 @@ from django.contrib.auth import (
     logout
 )
 from .models import Account, Profile
+from engine.models import Transaction
+from datetime import date
 
 from .forms import UserLoginForm, UserRegisterForm, AccountForm
 
@@ -58,16 +60,29 @@ def account_info(request):
         user = request.user
         profile = Profile.objects.filter(user = user)[0]
         accnt_name = form.cleaned_data.get('accountname')
-        available_bal = form.cleaned_data.get('current_bal')
-        has_transaction = False
-        last_trans_date = None
-        Account.objects.create(
+        initial_bal = form.cleaned_data.get('current_bal')
+        has_transaction = True
+        last_trans_date = date.today()
+
+        account  = Account(
             username=profile,
             account_name=accnt_name,
-            available_bal=available_bal,
+            available_bal=initial_bal,
             has_trans = has_transaction,
             last_trans = last_trans_date
             )
+
+        account.save()
+
+        Transaction.objects.create(
+            account = account,
+            other = user.username,
+            direction = True,    
+            date = last_trans_date,
+            amount = initial_bal,
+            amount_accnt = initial_bal
+        )
+
         profile.noAccount+=1
         profile.save()
 

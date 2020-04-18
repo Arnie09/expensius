@@ -5,6 +5,7 @@ from login.models import Account, Profile
 from django.http import JsonResponse
 from datetime import date
 from dateutil.parser import parse
+import json, requests
 
 # Create your views here.
 response = {}
@@ -40,113 +41,81 @@ def home(request):
 
     payload['account_bal'] = account_default.available_bal
     payload['account_name'] = account_default.account_name
+    payload['number_of_transactions'] = account_default.no_transac
 
     return render(request, 'expensius/home.html',payload)
 
 @login_required
-def add_transacton(request):
+def add_transacton(request, transaction_obj = None):
 
+    if transaction_obj is not None:
+        transaction_obj.save()
     # ajax function 
-    if request.method =="POST":
-
+    elif request.method =="POST":
+        
         Message = ""
         user = request.user
         direction = request.POST.get('payload[direction]')
         amount = request.POST.get('payload[amount]')
         given_date = parse(request.POST.get('payload[date]')).date()
+        print(amount, given_date)
         current_date = date.today()
         mapper = {'false':-1,'true':1}
         mapper2 = {False:-1,True:1}
         change = mapper[direction]*float(amount)
+
         profile = Profile.objects.get(user = user)
         account_obj = Account.objects.get(username = profile)
+
         last_balance = None
         flag = 0
-        update_future = False
-        transaction_set = None
 
-        if account_obj.has_trans == False:
+        '''
+        There is always going to be a transaction in an account.
+        So the scenarios are:
+            - Invalid transaction by user 
+                - invalid date(future)
+            - Makes a transaction which is before the first transaction
+        '''
 
-            # This is the case when there has beeen no previous transactions
-            current_bal = account_obj.available_bal
-            future_bal = current_bal+change
-            if future_bal<0:
-                #error, balance in account cannot be negetive
-                flag = 1
-                Message = 1
-            elif given_date>current_date:
-                flag = 1
-                Message = 2
+        if given_date > current_date:
+
+            flag = 1
+            Message = 2
+
+        else: 
+
+            prev_trans = Transaction.objects.filter(
+                    date__lte = given_date,
+                    account = account_obj
+                ).order_by('-date')
+
+            if len(prev_trans) == 0:
+                last_balance = 0
             else:
-                last_balance = account_obj.available_bal
-                Message = 4
-                account_obj.has_trans = True
-                account_obj.last_trans = given_date
-                account_obj.save()
+                last_balance = prev_trans[:1][0].amount_accnt
 
-        else:
+            if last_balance+change<0:
+                flag = 1
+                Message = 3
+            
+            future_trans = Transaction.objects.filter(
+                    date__gte = given_date,
+                    account = account_obj
+                ).order_by('date')
 
-            # this is the case when there has been previous transactions
-
-            #here comes 2 cases, 
-                #case 1: when the date of the new transaction > date of last inserted transaction 
-                #case 2: when the date of the new transaction is in between the last inserted transaction
-
-            last_date = account_obj.last_trans
-            if given_date>last_date:
-
-                # We check whether the new balancce is going to be negetive or not 
-                current_bal = account_obj.available_bal
-                future_bal = current_bal+change
-                if future_bal<0:
+            for transaction in future_trans:
+                amt = transaction.amount_accnt
+                new_amt = amt+change
+                if new_amt<0:
                     flag = 1
-                    Message = 1
-                elif given_date>current_date:
-                    flag = 1
-                    Message = 2
-                else:
-                    last_balance = account_obj.available_bal
-                    Message = 4
-
-            else:
-
-                # first we check if the given date is a valid date or not
-                if given_date>current_date:
-                    flag  = 1
-                    Message = 2
-                else:
-                    last_balance_obj = Transaction.objects.filter(date__lte = given_date,account= user).order_by('-date')[:1]
-                    if (len(last_balance_obj) == 0):
-                        future = Transaction.objects.filter(date__gte = given_date).order_by('date')[:1]
-                        last_balance = future[0].amount_accnt - future[0].amount*mapper2[future[0].direction]
-                    else:
-                        last_balance = last_balance_obj[0].amount_accnt
-                    if last_balance+change<0:
-                        flag = 1
-                        Message = 1
-                    else:
-                        transaction_set = Transaction.objects.filter(date__gt = given_date,date__lte = current_date,account = user).order_by('date')
-                        flag2 = 0
-                        for transaction in transaction_set:
-                            amt = transaction.amount_accnt
-                            new_amt = amt+change
-                            if new_amt<0:
-                                flag2 = 1
-                                break
-                        if flag2 == 0:
-                            update_future = True
-                            Message = 4
-                        else:
-                            flag = 1
-                            Message = 3
-
+                    Message = 3
+                    break
 
         if flag == 0:
-            if direction == 'true':
-                direction = True
-            elif direction == 'false':
-                direction = False
 
+            direction = True if direction == "true" else False
+            Message = 4
             Transaction.objects.create(
                 account = account_obj,
                 other = request.POST.get('payload[other]'),
@@ -155,22 +124,23 @@ def add_transacton(request):
                 date = request.POST.get('payload[date]'),
                 amount_accnt = last_balance+change
             )
+            
+            account_obj.last_trans = given_date if account_obj.has_trans == False else account_obj.last_trans
+            account_obj.last_trans = max(given_date, account_obj.last_trans)
+            account_obj.no_transac+=1
 
-            if given_date>account_obj.last_trans:
-                account_obj.last_trans = given_date
-
-            if update_future == True:
-                LAST = None
-                for transaction in transaction_set:
-                    transaction.amount_accnt += change
-                    LAST = transaction.amount_accnt
-                    transaction.save()
-                account_obj.available_bal = LAST
-            else:
-                account_obj.available_bal = last_balance+change
-
+            LAST = None
+            for transaction in future_trans:
+                transaction.amount_accnt += change
+                LAST = transaction.amount_accnt
+                transaction.save()
+            account_obj.available_bal = LAST
+   
+            account_obj.available_bal = last_balance+change if LAST is None else account_obj.available_bal
+            account_obj.has_trans = True 
+            
             account_obj.save()
-
+            
         response = {
             'mssg':Message
         }
@@ -185,14 +155,14 @@ def delete_transaction(request):
         Message = ""
         user = request.user
         id_tran = request.POST.get('payload[id]') 
-        direction = Transaction.objects.filter(id = id_tran)[0].direction
-        amount = Transaction.objects.filter(id = id_tran)[0].amount
-        given_date = Transaction.objects.filter(id = id_tran)[0].date.date()
+        direction = Transaction.objects.filter(transactionID = id_tran)[0].direction
+        amount = Transaction.objects.filter(transactionID = id_tran)[0].amount
+        given_date = Transaction.objects.filter(transactionID = id_tran)[0].date.date()
         current_date = date.today()
         mapper = {False:-1,True:1}
         change = mapper[direction]*float(amount)
-
-        account_obj = Account.objects.get(username = user)
+        profile_obj = Profile.objects.get(user = user)
+        account_obj = Account.objects.get(username = profile_obj)
         last_balance = None
         flag = 0
         update_future = False
@@ -203,34 +173,54 @@ def delete_transaction(request):
                 # when the last transaction is also the first transaction 
                 # and when the last transaction is not the first transaction
 
-            previous_tran_obj = Transaction.objects.filter(date__lte = given_date, account = user).order_by('-date')[:2]
+            previous_tran_obj = Transaction.objects.filter(
+                    date__lte = given_date,
+                    account = account_obj
+                ).order_by('-date')[:2]
+
             if len(previous_tran_obj)>1:
                 account_obj.available_bal = previous_tran_obj[1].amount_accnt
                 account_obj.last_trans = previous_tran_obj[1].date
                 account_obj.save()
                 Message = 4
-                Transaction.objects.filter(id=id_tran).delete()
+                Transaction.objects.filter(transactionID = id_tran).delete()
+
             elif len(previous_tran_obj) == 1:
                 account_obj.available_bal -= change
                 account_obj.last_trans = None
                 account_obj.has_trans = False
                 account_obj.save()
                 Message = 4
-                Transaction.objects.filter(id = id_tran).delete()
+                Transaction.objects.filter(transactionID = id_tran).delete()
 
 
         # This is for when the user will select a transaction of the user which any but the last transaction 
         else:
-            Transaction.objects.filter(id = id_tran).delete()
-            future_tran_obj = Transaction.objects.filter(date__gte = given_date, account = user)
-            LAST = None
+            future_tran_obj = Transaction.objects.filter(date__gte = given_date, account = account_obj)
+            
+            # we check if its possible to carry out the deletion
             for transaction in future_tran_obj:
-                transaction.amount_accnt -= change
-                LAST = transaction.amount_accnt
-                transaction.save()
-            account_obj.available_bal = LAST
+                amt = transaction.amount_accnt
+                new_amt = amt-change
+                if new_amt<0:
+                    flag = 1
+                    Message = 3
+                    break
+
+            if flag == 0:       
+                LAST = None
+                for transaction in future_tran_obj:
+                    transaction.amount_accnt -= change
+                    LAST = transaction.amount_accnt
+                    transaction.save()
+                account_obj.available_bal = LAST
+                account_obj.save()
+                Transaction.objects.filter(transactionID = id_tran).delete()
+                Message = 4
+
+        if Message == 4:
+            account_obj.no_transac -= 1 
             account_obj.save()
-            Message = 4
 
         response = {
             'mssg':Message
@@ -244,11 +234,19 @@ def delete_transaction(request):
 def edit_transaction(request):
 
     if request.method == "POST":
+        old_tran = Transaction.objects.get(transactionID = request.POST.get('payload[id]'))
         delete_transaction(request)
-        return add_transacton(request)
-        # global response
-        # return JsonResponse(response)
+        message = json.loads(add_transacton(request).content)["mssg"]
+        
+        response = {
+            'mssg':message
+        }
 
+        if message != 4:
+            add_transacton(request,old_tran)
+            
+        return JsonResponse(response)
+        
     return redirect('/')
 
 @login_required
@@ -258,11 +256,13 @@ def delete_all_transaction(request):
         Message = None
         password = request.POST.get('payload[password]')
         user = request.user
+        profile_obj = Profile.objects.get(user = user)
         if user.check_password(password):
-            Account.objects.filter(username = user).delete()
-            transactions = Transaction.objects.filter(account = user)
+            account_obj = Account.objects.get(username = profile_obj)
+            transactions = Transaction.objects.filter(account = account_obj)
             for transaction in transactions:
                 transaction.delete()
+            account_obj.delete()
             Message = 2
         else:
             Message = 1

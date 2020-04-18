@@ -6,6 +6,7 @@ class Profile(models.Model):
     user = models.OneToOneField(User,on_delete=models.CASCADE)
     profileID = models.UUIDField(primary_key=True, default=uuid4, editable=False)
     noAccount = models.IntegerField(default=0)
+    isPaid = models.BooleanField(default=False, null = False)
 
     def __str__(self):
         return "%s %s" % (self.user.username, self.noAccount)
