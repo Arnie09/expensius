@@ -48,21 +48,31 @@ def home(request):
 @login_required
 def add_transacton(request, transaction_obj = None):
 
-    if transaction_obj is not None:
-        transaction_obj.save()
     # ajax function 
-    elif request.method =="POST":
+    if request.method =="POST" or transaction_obj is not None:
         
         Message = ""
         user = request.user
-        direction = request.POST.get('payload[direction]')
-        amount = request.POST.get('payload[amount]')
-        given_date = parse(request.POST.get('payload[date]')).date()
-        print(amount, given_date)
-        current_date = date.today()
         mapper = {'false':-1,'true':1}
         mapper2 = {False:-1,True:1}
-        change = mapper[direction]*float(amount)
+        other = None
+        direction = None
+
+        if transaction_obj is None:
+            direction = request.POST.get('payload[direction]')
+            amount = request.POST.get('payload[amount]')
+            given_date = parse(request.POST.get('payload[date]')).date()
+            other = request.POST.get('payload[other]')
+            change = mapper[direction]*float(amount)
+        else:
+            direction = transaction_obj.direction
+            print("Here",direction)
+            amount = transaction_obj.amount
+            given_date = transaction_obj.date.date()
+            other = transaction_obj.other
+            change = mapper2[direction]*float(amount)
+
+        current_date = date.today()
 
         profile = Profile.objects.get(user = user)
         account_obj = Account.objects.get(username = profile)
@@ -77,7 +87,7 @@ def add_transacton(request, transaction_obj = None):
                 - invalid date(future)
             - Makes a transaction which is before the first transaction
         '''
-
+        print("Here3",direction)
         if given_date > current_date:
 
             flag = 1
@@ -114,14 +124,16 @@ def add_transacton(request, transaction_obj = None):
 
         if flag == 0:
 
-            direction = True if direction == "true" else False
+            direction = True if direction == "true" or direction == True else False
+
             Message = 4
+            print("Here2",direction)
             Transaction.objects.create(
                 account = account_obj,
-                other = request.POST.get('payload[other]'),
+                other = other,
                 direction = direction,
                 amount = amount,
-                date = request.POST.get('payload[date]'),
+                date = given_date,
                 amount_accnt = last_balance+change
             )
             
@@ -227,7 +239,6 @@ def delete_transaction(request):
         }
         return JsonResponse(response)
 
-        
     return redirect('/')
 
 @login_required
