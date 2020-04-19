@@ -43,7 +43,8 @@
     }
 
     .account-details{
-        height: 700px;
+        height: auto;
+        margin-bottom: 50px;
     }
 
     .h4{
@@ -55,8 +56,8 @@
         background-color: white;
         position: relative;
         margin: auto;
-        width: 60vw;
-        height: 60vh;
+        /* width: 60vw; */
+        height: 600px !important;
     }
 
     canvas {
@@ -67,6 +68,11 @@
 
     .mr-auto {
         margin-right: 0 !important;
+    }
+
+    .table-responsive{
+        width: 100%;
+        margin: auto;
     }
 
 </style>
@@ -102,38 +108,35 @@
         <div class = "row justify-content-center">
             <div class="box col-md-3 col-xs-10 holds-dropdown">
                 <br>
-                <ul>
-                    <h4><b>Account details</b></h4>
-                    <h5>Account name: {{ account_name }}</h5>
-                    <h5>Current available balance: {{ account_bal }}</h5>
-                    <h5>Total number of transactions: {{ number_of_transactions }}</h5>
-                    <br>
-                    <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#ModalTransactionForm">
-                        Enter a transaction
-                    </button>
-                    <br>
-                    <br>
-                    <button type="button" class="btn btn-danger" data-toggle="modal" data-target="#ModalTransactionDeleteForm">
-                        Delete all transactions
-                    </button>
+                <h4><b>Account details</b></h4>
+                <h5>Account name: {{ account_name }}</h5>
+                <h5>Current available balance: {{ account_bal }}</h5>
+                <h5>Total number of transactions: {{ number_of_transactions }}</h5>
+                <br>
+                <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#ModalTransactionForm">
+                    Enter a transaction
+                </button>
+                <br>
+                <br>
+                <button type="button" class="btn btn-danger" data-toggle="modal" data-target="#ModalTransactionDeleteForm">
+                    Delete all transactions
+                </button>
 
-                </ul>
             </div>
             <div class="box col-md-8 col-xs-12 right-side holds-graphs justify-content-center">
-                <div class="chart-container containerToHoldGraph">
-                    <canvas id="myChart"></canvas>
+                <div class="chart-container containerToHoldGraph fluid-resposive">
+                    <!-- <canvas id="myChart"></canvas> -->
+                    <canvas class="my-4 chartjs-render-monitor" id="myChart"></canvas>
                 </div>
             </div>
         </div>
     </div>
 </div>
 
-<br>
 <!-- list of transactions  -->
 <div class="row justify-content-center fluid-resposive">
     <div class="box col-md-11 col-xs-10 holds-table">
         <br>
-        <ul>
             <h4><b>Transaction details</b></h4>
             <h6><i>Click on a transaction to select it</i></h6>
             <div class = "table-responsive">
@@ -163,7 +166,6 @@
                     {% endfor %}
                 </table>
             </div>
-        </ul>
     </div>
 </div>
 
