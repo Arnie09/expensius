@@ -69,7 +69,8 @@ def account_info(request):
             account_name=accnt_name,
             available_bal=initial_bal,
             has_trans = has_transaction,
-            last_trans = last_trans_date
+            last_trans = last_trans_date,
+            no_transac = 1
             )
 
         account.save()
