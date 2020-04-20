@@ -1,5 +1,6 @@
 from django.shortcuts import render,redirect
 from django.contrib.auth.decorators import login_required
+from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
 from .models import Transaction
 from login.models import Account, Profile
 from django.http import JsonResponse
@@ -7,43 +8,49 @@ from datetime import date
 from dateutil.parser import parse
 import json, requests
 
+
 # Create your views here.
 response = {}
+paginator = None
 
 @login_required
 def home(request):
     user = request.user
     profile_obj = Profile.objects.get(user = user)
     account_default = Account.objects.get(username = profile_obj)
-    transaction_objects = Transaction.objects.filter(account = account_default).order_by('date')[:50]
+    transaction_objects = Transaction.objects.filter(account = account_default).order_by('date')
+    page = request.GET.get('page', 1)
+    global paginator
+    paginator = Paginator(transaction_objects, 10)
+    number_pages = paginator.num_pages
+    transactions = paginator.page(1)
     
     payload = {}
 
-    if transaction_objects == None:
-        payload['transactions'] = -1
-    else:
-        payload['transactions_len'] = len(transaction_objects)
-        payload['transactions'] = transaction_objects
-        payload['transaction_id'] = []
-        payload['transaction_with'] = []
-        payload['transaction_amt'] = []
-        payload['transaction_date'] = []
-        payload['transaction_direction'] = []
-        payload['transaction_history'] = []
-
-        for transaction in transaction_objects:
-            payload['transaction_id'].append(str(transaction.transactionID))
-            payload['transaction_with'].append(transaction.other)
-            payload['transaction_amt'].append(transaction.amount)
-            payload['transaction_date'].append(transaction.date)
-            payload['transaction_direction'].append(transaction.direction)
-            payload['transaction_history'].append(transaction.amount_accnt)
-
+    # payload['transactions'] = transactions
+    payload['number_of_trans'] = number_pages
     payload['account_bal'] = account_default.available_bal
     payload['account_name'] = account_default.account_name
     payload['number_of_transactions'] = account_default.no_transac
 
     return render(request, 'expensius/home.html',payload)
+
+@login_required
+def get_transaction(request):
+    if request.method == "POST":
+        page_no = request.POST.get('payload')
+        global paginator
+        transactions = None
+        try:
+            transactions = paginator.page(page_no)
+        except PageNotAnInteger:
+            transactions = paginator.page(1)
+        except EmptyPage:
+            transactions = paginator.page(paginator.num_pages)
+
+        return render(request, 'expensius/get_transactions.html', {'transactions':transactions})
+
+
 
 @login_required
 def add_transacton(request, transaction_obj = None):

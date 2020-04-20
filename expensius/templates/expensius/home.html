@@ -77,6 +77,7 @@
 
 </style>
 
+
 <!-- navbar  -->
 <nav class="navbar navbar-expand-lg navbar-dark shadow" id="mainNav">
     <div class="container-fluid">
@@ -101,6 +102,103 @@
 </nav>
 <br>
 <br>
+
+<!-- chart showing rules -->
+<script>
+
+    var transaction_date = []
+    var amount = []
+    function showGraph(){
+        
+
+        var dates = document.getElementsByClassName('trans_date')
+        var amounts = document.getElementsByClassName('trans_amount')
+        for (var i = 0 ; i < dates.length; i++){
+            transaction_date.push($(dates[i]).html())
+            amount.push($(amounts[i]).html())
+        }
+        
+
+        var ctx = document.getElementById('myChart').getContext('2d');
+
+        var gradientStroke = ctx.createLinearGradient(500, 0, 400, 0);
+        gradientStroke.addColorStop(0, "#80b6f4");
+        gradientStroke.addColorStop(1, "#f49080");
+
+        var gradientFill = ctx.createLinearGradient(500, 0, 400, 0);
+        gradientFill.addColorStop(0, "rgba(128, 182, 244, 0.6)");
+        gradientFill.addColorStop(1, "rgba(244, 144, 128, 0.6)");
+
+        var list = {}
+        var myChart = new Chart(ctx, {
+            type: 'line',
+            data: {
+                
+                labels: transaction_date,
+                datasets: [{
+                    label: "Amount of money over time",
+                    data: amount,
+                    borderColor: gradientStroke,
+                    pointBorderColor: gradientStroke,
+                    pointBackgroundColor: gradientStroke,
+                    pointHoverBackgroundColor: gradientStroke,
+                    pointHoverBorderColor: gradientStroke,
+                    backgroundColor:gradientFill,
+                    pointBorderWidth: 10,
+                    pointHoverRadius: 10,
+                    pointHoverBorderWidth: 1,
+                    pointRadius: 3,
+                }]
+            },
+            options: {
+                scales: {
+                    yAxes: [{
+                        ticks: {
+                            beginAtZero: true
+                        }
+                    }]
+                }
+            }
+        });
+
+    };
+    // showGraph()
+</script>
+
+<!-- script for transaction list pagination -->
+<script>
+    
+    var pages = []
+    function getTransaction(page_no){
+        console.log('i was called',page_no)
+        var table = document.getElementById('table-responsive')
+        window.CSRF_TOKEN = "{{ csrf_token }}";
+        $.ajax({
+            type:'POST',
+            url:'/get_transaction/',
+            data:{
+                'payload':page_no,
+                'csrfmiddlewaretoken': window.CSRF_TOKEN,
+            },
+            // This is processing of what we get back
+            success:function(response){
+                // from here we fill the cell and call the method to populate the graph
+                
+                if(!pages.includes(page_no)){
+                    $('.table-responsive').children('.complete-table').remove()
+                    pages.push(page_no)
+                    $('#table-responsive').append(response)
+                    showGraph()
+                }
+            },
+            error:function(){
+                console.log("Error")
+            }
+            
+        });
+    }
+    getTransaction(1)
+</script>
 
 <!-- account details and chart  -->
 <div class="row justify-content-center fluid-resposive">
@@ -139,35 +237,15 @@
         <br>
             <h4><b>Transaction details</b></h4>
             <h6><i>Click on a transaction to select it</i></h6>
-            <div class = "table-responsive">
-                <table class="table table-striped" id = "table-transaction">
-                    <thead>
-                        <tr>
-                        <!-- <th scope="col">#</th> -->
-                        <th scope="col">Transaction Date</th>
-                        <th scope="col">Transaction with</th>
-                        <th scope="col">Transaction Amount</th>
-                        <th scope="col">CR/DB</th>
-                        <th scope="col">Amount in accnt.</th>
-                        <th scope="col">ID</th>
-                        </tr>
-                    </thead>
-                    {% for transaction in transactions %}
-                    <tbody>
-                        <tr>
-                        <td>{{transaction.date|date}}</td>
-                        <td>{{transaction.other}}</td>
-                        <td>{{transaction.amount}}</td>
-                        <td>{{transaction.direction}}</td>
-                        <td>{{transaction.amount_accnt}}</td>
-                        <td>{{transaction.transactionID}}</td>
-                        </tr>
-                    </tbody>
-                    {% endfor %}
-                </table>
+            <div class = "table-responsive" id = "table-responsive">
+                <!-- //table contents -->
             </div>
     </div>
+        
 </div>
+
+
+
 
 <div id="ModalTransactionDeleteForm" class="modal fade">
     <div class="modal-dialog" role="document">
@@ -529,66 +607,6 @@ $(document).on('click','#Delete_transaction',function(e){
         })
 </script>
 
-<!-- chart showing rules -->
-<script>
-
-    var transaction_date = []
-    var amount = []
-    
-    {% for date in transaction_date %}
-        var dateObj = new Date('{{ date.isoformat }}')
-        var month = dateObj.getUTCMonth() + 1; //months from 1-12
-        var day = dateObj.getUTCDate();
-        var year = dateObj.getUTCFullYear();
-
-        var newdate = day + "/" + month + "/" + year;
-        transaction_date.push(newdate)
-    {% endfor %}
-    amount = {{transaction_history}}
-
-    var ctx = document.getElementById('myChart').getContext('2d');
-
-    var gradientStroke = ctx.createLinearGradient(500, 0, 400, 0);
-    gradientStroke.addColorStop(0, "#80b6f4");
-    gradientStroke.addColorStop(1, "#f49080");
-
-    var gradientFill = ctx.createLinearGradient(500, 0, 400, 0);
-    gradientFill.addColorStop(0, "rgba(128, 182, 244, 0.6)");
-    gradientFill.addColorStop(1, "rgba(244, 144, 128, 0.6)");
-
-    var list = {}
-    var myChart = new Chart(ctx, {
-        type: 'line',
-        data: {
-            
-            labels: transaction_date,
-            datasets: [{
-                label: "Amount of money over time",
-                data: amount,
-                borderColor: gradientStroke,
-                pointBorderColor: gradientStroke,
-                pointBackgroundColor: gradientStroke,
-                pointHoverBackgroundColor: gradientStroke,
-                pointHoverBorderColor: gradientStroke,
-                backgroundColor:gradientFill,
-                pointBorderWidth: 10,
-                pointHoverRadius: 10,
-                pointHoverBorderWidth: 1,
-                pointRadius: 3,
-            }]
-        },
-        options: {
-            scales: {
-                yAxes: [{
-                    ticks: {
-                        beginAtZero: true
-                    }
-                }]
-            }
-        }
-    });
-    
-    </script>
 
 
 {% endblock %}
