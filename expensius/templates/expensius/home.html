@@ -6,6 +6,7 @@
 <script src="https://cdn.jsdelivr.net/npm/chart.js@2.9.3/dist/Chart.min.js"></script>
 <!-- js.cookie -->
 <script src="https://cdnjs.cloudflare.com/ajax/libs/js-cookie/2.2.1/js.cookie.js"></script>
+<script src="https://kit.fontawesome.com/86561c2b48.js" crossorigin="anonymous"></script>
 
 <style>
 
@@ -74,6 +75,32 @@
         width: 100%;
         margin: auto;
     }
+    
+    .paginator{
+        width: 5%; /*can be in percentage also.*/
+        height: auto;
+        margin: 0 auto;
+    }
+
+    .account-selector{
+        width: 55%;
+        margin: 0 auto;
+        height: auto;
+    }
+
+    .btn-dft{
+        background: #fd746c !important;
+        color: white;
+    }
+
+    .dropdown{
+        margin: 10px;
+    }
+
+    .add-button{
+        height: 100%;
+        margin: auto;
+    }
 
 </style>
 
@@ -101,6 +128,35 @@
     </div>
 </nav>
 <br>
+<br>
+
+<!-- section for searching  -->
+<div class="row justify-content-center fluid-resposive">
+    <div class="col-md-11">
+        <div class = "row justify-content-center">
+            <div class="box col-md-3 col-xs-10">
+                <div  class = "row account-selector">
+                    <div class = "dropdown">
+                        <button class="btn btn-dft dropdown-toggle" type="button" data-toggle="dropdown">Choose Account
+                            <span class="caret"></span></button>
+                            <ul class="dropdown-menu">
+                              {% for account in account_names %}
+                              <li><a href="#" style="color: #fd746c;" >{{account}}</a></li>
+                              {% endfor %}
+                            </ul>
+                    </div>
+                    <button type="button" class="btn btn-default btn-sm add-button">
+                        <i class="fas fa-plus"></i>                  
+                    </button>
+                </div>
+
+            </div>
+            <div class="box col-md-8 col-xs-12 right-side holds-graphs justify-content-center">
+                
+            </div>
+        </div>
+    </div>
+</div>
 <br>
 
 <!-- chart showing rules -->
@@ -183,11 +239,11 @@
             // This is processing of what we get back
             success:function(response){
                 // from here we fill the cell and call the method to populate the graph
+                $('.table-responsive').children('.complete-table').remove()
+                $('#table-responsive').append(response)
                 
                 if(!pages.includes(page_no)){
-                    $('.table-responsive').children('.complete-table').remove()
                     pages.push(page_no)
-                    $('#table-responsive').append(response)
                     showGraph()
                 }
             },

@@ -17,17 +17,19 @@ paginator = None
 def home(request):
     user = request.user
     profile_obj = Profile.objects.get(user = user)
-    account_default = Account.objects.get(username = profile_obj)
+    account_objs = Account.objects.filter(username = profile_obj)
+    account_default = account_objs[0]
     transaction_objects = Transaction.objects.filter(account = account_default).order_by('date')
     page = request.GET.get('page', 1)
     global paginator
     paginator = Paginator(transaction_objects, 10)
     number_pages = paginator.num_pages
     transactions = paginator.page(1)
+    account_names = [accnt_obj.account_name for accnt_obj in account_objs]
     
     payload = {}
 
-    # payload['transactions'] = transactions
+    payload['account_names'] = account_names
     payload['number_of_trans'] = number_pages
     payload['account_bal'] = account_default.available_bal
     payload['account_name'] = account_default.account_name
