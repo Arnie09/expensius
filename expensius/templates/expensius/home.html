@@ -272,7 +272,7 @@
                 </button>
                 <br>
                 <br>
-                <button type="button" class="btn btn-danger" data-toggle="modal" data-target="#ModalTransactionDeleteForm">
+                <button type="button" class="btn btn-dft" data-toggle="modal" data-target="#ModalTransactionDeleteForm">
                     Delete all transactions
                 </button>
 
@@ -513,6 +513,7 @@
             
             var payload = {
                 password: document.getElementById('password_confirm').value,
+                account: '{{account_name}}'
             }
 
             $.ajax({
@@ -530,7 +531,7 @@
                     }
                     else if(response == 2){
                         alert("Successfully deleted all your transactions and deleted your account!")
-                        window.location.href = "{% url 'account'%}";
+                        window.location.href = "{% url 'home'%}";
                     }
                     // update list 
                 },

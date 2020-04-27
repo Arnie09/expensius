@@ -3,10 +3,12 @@ from django.contrib.auth.decorators import login_required
 from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
 from .models import Transaction
 from login.models import Account, Profile
+from login.views import account_info
 from django.http import JsonResponse
 from datetime import date
 from dateutil.parser import parse
 import json, requests
+from login.forms import AccountForm
 
 
 # Create your views here.
@@ -21,6 +23,8 @@ def home(request, account = None):
     account_default = None
     account_objs = Account.objects.filter(username = profile_obj)
     if account == None:
+        if len(account_objs) == 0:
+            return redirect(account_info)
         account_default = account_objs[0]
     else:
         account_default = Account.objects.get(account_name = account)
@@ -284,14 +288,18 @@ def delete_all_transaction(request):
     if request.method == "POST":
         Message = None
         password = request.POST.get('payload[password]')
+        account = request.POST.get('payload[account]')
         user = request.user
         profile_obj = Profile.objects.get(user = user)
         if user.check_password(password):
-            account_obj = Account.objects.get(username = profile_obj)
+            print(account)
+            account_obj = Account.objects.get(account_name = account)
             transactions = Transaction.objects.filter(account = account_obj)
             for transaction in transactions:
                 transaction.delete()
             account_obj.delete()
+            profile_obj.noAccount-=1
+            profile_obj.save()
             Message = 2
         else:
             Message = 1
