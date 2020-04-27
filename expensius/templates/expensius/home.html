@@ -1,7 +1,4 @@
-{% extends "expensius/base.html" %} 
-
-{% load static %}
-{% block content %}
+{% extends "expensius/base.html" %} {% load static %} {% block content %}
 <!-- chart js  -->
 <script src="https://cdn.jsdelivr.net/npm/chart.js@2.9.3/dist/Chart.min.js"></script>
 <!-- js.cookie -->
@@ -9,99 +6,152 @@
 <script src="https://kit.fontawesome.com/86561c2b48.js" crossorigin="anonymous"></script>
 
 <style>
-
-    .box{
+    .box {
         text-align: center;
         /* z-index: 0; */
         margin: 0 10px 0 10px;
         box-shadow: 0 5px 15px 2px rgba(0, 0, 0, 0.15);
     }
-
-    .box:hover{
+    
+    .box:hover {
         box-shadow: 0 5px 15px 2px rgba(0, 0, 0, 0.2);
         /* -webkit-transform: scale(1.005);
         -ms-transform: scale(1.005);
         transform: scale(1.005);
         -webkit-transition: transform 0.2s ease-in-out; */
     }
-
-    .navbar{
-        background: #fd746c;  /* fallback for old browsers */
-        background: -webkit-linear-gradient(to right, #ff9068, #fd746c);  /* Chrome 10-25, Safari 5.1-6 */
-        background: linear-gradient(to right, #ff9068, #fd746c); /* W3C, IE 10+/ Edge, Firefox 16+, Chrome 26+, Opera 12+, Safari 7+ */
+    
+    .navbar {
+        background: #fd746c;
+        /* fallback for old browsers */
+        background: -webkit-linear-gradient(to right, #ff9068, #fd746c);
+        /* Chrome 10-25, Safari 5.1-6 */
+        background: linear-gradient(to right, #ff9068, #fd746c);
+        /* W3C, IE 10+/ Edge, Firefox 16+, Chrome 26+, Opera 12+, Safari 7+ */
         /* W3C, IE 10+/ Edge, Firefox 16+, Chrome 26+, Opera 12+, Safari 7+ */
     }
-
-    .navbar-brand{
+    
+    .navbar-brand {
         color: white !important;
         font-weight: bolder !important;
     }
-
-    .nav-link{
+    
+    .nav-link {
         color: white !important;
-        font-weight:100 !important;
+        font-weight: 100 !important;
         align-self: end;
     }
-
-    .account-details{
+    
+    .account-details {
         height: auto;
         margin-bottom: 50px;
     }
-
-    .h4{
+    
+    .h4 {
         margin: 10px;
         margin-top: 50px;
     }
-
-    .chart-container{
+    
+    .chart-container {
         background-color: white;
         position: relative;
         margin: auto;
         /* width: 60vw; */
         height: 600px !important;
     }
-
+    
     canvas {
-        background-color: white; 
+        background-color: white;
         width: 100%;
         height: auto;
     }
-
+    
     .mr-auto {
         margin-right: 0 !important;
     }
-
-    .table-responsive{
+    
+    .table-responsive {
         width: 100%;
         margin: auto;
     }
     
-    .paginator{
-        width: 5%; /*can be in percentage also.*/
+    .paginator {
+        width: 5%;
+        /*can be in percentage also.*/
         height: auto;
         margin: 0 auto;
     }
-
-    .account-selector{
+    
+    .account-selector {
         width: 55%;
         margin: 0 auto;
         height: auto;
     }
-
-    .btn-dft{
+    
+    .btn-dft {
         background: #fd746c !important;
         color: white;
     }
-
-    .dropdown{
+    
+    .dropdown {
         margin: 10px;
     }
-
-    .add-button{
+    
+    .add-button {
         height: 100%;
         margin: auto;
     }
-
+    /* Dropdown Button */
+    
+    .dropbtn {
+        color: white !important;
+        padding: 5px;
+        font-size: 16px;
+        border: none;
+    }
+    /* The container <div> - needed to position the dropdown content */
+    
+    .dropdown {
+        position: relative;
+        display: inline-block;
+    }
+    /* Dropdown Content (Hidden by Default) */
+    
+    .dropdown-content {
+        display: none;
+        position: absolute;
+        background-color: #f1f1f1;
+        min-width: 160px;
+        box-shadow: 0px 8px 16px 0px rgba(0, 0, 0, 0.2);
+        z-index: 1;
+    }
+    /* Links inside the dropdown */
+    
+    .dropdown-content a {
+        color: black;
+        padding: 12px 16px;
+        text-decoration: none;
+        display: block;
+    }
+    /* Change color of dropdown links on hover */
+    
+    .dropdown-content a:hover {
+        background-color: #ddd;
+    }
+    /* Show the dropdown menu on hover */
+    
+    .dropdown:hover .dropdown-content {
+        display: block;
+    }
+    /* Change the background color of the dropdown button when the dropdown content is shown */
+    
+    .nav-link:hover {
+        background-color: #ff443a;
+    }
+    
+    .dropdown:hover .dropbtn {
+        background-color: #ff443a;
+    }
 </style>
 
 
@@ -109,22 +159,29 @@
 <nav class="navbar navbar-expand-lg navbar-dark shadow" id="mainNav">
     <div class="container-fluid">
         <a class="navbar-brand" href="">Expensius</a>
-        <button class="navbar-toggler navbar-toggler-right" type="button" data-toggle="collapse" data-target="#navbarResponsive"
-            aria-controls="navbarResponsive" aria-expanded="false" aria-label="Toggle navigation">
+        <button class="navbar-toggler navbar-toggler-right" type="button" data-toggle="collapse" data-target="#navbarResponsive" aria-controls="navbarResponsive" aria-expanded="false" aria-label="Toggle navigation">
             <span class="navbar-toggler-icon"></span>
         </button>
-        <div class="collapse navbar-collapse pull-right" id="navbarResponsive">
-            <ul class="navbar-nav ml-auto">
-                <a class="nav-link text-black font-weight-bold" href= "">Hi,{{ user.username }}</a>    
-            </ul>
-            <ul class="navbar-nav ml-none">
-                <a class="nav-link text-black font-weight-bold" href="{% url 'about' %}">About</a>
-            </ul>
-            <ul class="navbar-nav ml-none">
-                <a class="nav-link text-black font-weight-bold" href="{% url 'logout' %}">Logout</a>   
-            </ul>
-            
-        </div>
+        <ul class="navbar-nav ml-auto">
+            <a class="nav-link text-black font-weight-bold" href=""></a>
+            <div class="dropdown">
+                <a class="dropbtn collapse navbar-collapse pull-right" id="navbarResponsive">Hi,{{ user.username }}</a>
+                <div class="dropdown-content">
+                    <a>Number of accounts: {{ number_accounts }}</a>
+                    <a href="#">Support us!</a>
+                    <a href="#">Change Password</a>
+                    <a href="#">Delete Account</a>
+                </div>
+            </div>
+        </ul>
+        <ul class="navbar-nav ml-none">
+            <a class="nav-link text-black font-weight-bold" href="{% url 'about' %}">About</a>
+        </ul>
+        <ul class="navbar-nav ml-none">
+            <a class="nav-link text-black font-weight-bold" href="{% url 'logout' %}">Logout</a>
+        </ul>
+
+    </div>
     </div>
 </nav>
 <br>
@@ -133,26 +190,26 @@
 <!-- section for searching  -->
 <div class="row justify-content-center fluid-resposive">
     <div class="col-md-11">
-        <div class = "row justify-content-center">
+        <div class="row justify-content-center">
             <div class="box col-md-3 col-xs-10">
-                <div  class = "row account-selector">
-                    <div class = "dropdown">
+                <div class="row account-selector">
+                    <div class="dropdown">
                         <button class="btn btn-dft dropdown-toggle" type="button" data-toggle="dropdown">Choose Account
                             <span class="caret"></span></button>
-                            <ul class="dropdown-menu">
-                              {% for account in account_names %}
-                             <li><a href="{% url 'home' account=account %}" method="POST" style="color: #fd746c;" >{{account}}</a></li>
-                              {% endfor %}
-                            </ul>
+                        <ul class="dropdown-menu">
+                            {% for account in account_names %}
+                            <li><a href="{% url 'home' account=account %}" method="POST" style="color: #fd746c;">{{account}}</a></li>
+                            {% endfor %}
+                        </ul>
                     </div>
                     <a href="{% url 'account' %}" class="btn btn-dft btn-sm add-button">
-                        <i class="fas fa-plus"></i>                  
+                        <i class="fas fa-plus"></i>
                     </a>
                 </div>
 
             </div>
             <div class="box col-md-8 col-xs-12 right-side holds-graphs justify-content-center">
-                
+
             </div>
         </div>
     </div>
@@ -161,19 +218,19 @@
 
 <!-- chart showing rules -->
 <script>
-
     var transaction_date = []
     var amount = []
-    function showGraph(){
-        
+
+    function showGraph() {
+
 
         var dates = document.getElementsByClassName('trans_date')
         var amounts = document.getElementsByClassName('trans_amount')
-        for (var i = 0 ; i < dates.length; i++){
+        for (var i = 0; i < dates.length; i++) {
             transaction_date.push($(dates[i]).html())
             amount.push($(amounts[i]).html())
         }
-        
+
 
         var ctx = document.getElementById('myChart').getContext('2d');
 
@@ -189,7 +246,7 @@
         var myChart = new Chart(ctx, {
             type: 'line',
             data: {
-                
+
                 labels: transaction_date,
                 datasets: [{
                     label: "Amount of money over time",
@@ -199,7 +256,7 @@
                     pointBackgroundColor: gradientStroke,
                     pointHoverBackgroundColor: gradientStroke,
                     pointHoverBorderColor: gradientStroke,
-                    backgroundColor:gradientFill,
+                    backgroundColor: gradientFill,
                     pointBorderWidth: 10,
                     pointHoverRadius: 10,
                     pointHoverBorderWidth: 1,
@@ -223,34 +280,34 @@
 
 <!-- script for transaction list pagination -->
 <script>
-    
     var pages = []
-    function getTransaction(page_no){
-        console.log('i was called',page_no)
+
+    function getTransaction(page_no) {
+        console.log('i was called', page_no)
         var table = document.getElementById('table-responsive')
         window.CSRF_TOKEN = "{{ csrf_token }}";
         $.ajax({
-            type:'POST',
-            url:'/get_transaction/',
-            data:{
-                'payload':page_no,
+            type: 'POST',
+            url: '/get_transaction/',
+            data: {
+                'payload': page_no,
                 'csrfmiddlewaretoken': window.CSRF_TOKEN,
             },
             // This is processing of what we get back
-            success:function(response){
+            success: function(response) {
                 // from here we fill the cell and call the method to populate the graph
                 $('.table-responsive').children('.complete-table').remove()
                 $('#table-responsive').append(response)
-                
-                if(!pages.includes(page_no)){
+
+                if (!pages.includes(page_no)) {
                     pages.push(page_no)
                     showGraph()
                 }
             },
-            error:function(){
+            error: function() {
                 console.log("Error")
             }
-            
+
         });
     }
     getTransaction(1)
@@ -259,13 +316,14 @@
 <!-- account details and chart  -->
 <div class="row justify-content-center fluid-resposive">
     <div class="col-md-11 account-details">
-        <div class = "row justify-content-center">
+        <div class="row justify-content-center">
             <div class="box col-md-3 col-xs-10 holds-dropdown">
                 <br>
                 <h4><b>Account details</b></h4>
                 <h5>Account name: {{ account_name }}</h5>
                 <h5>Current available balance: {{ account_bal }}</h5>
                 <h5>Total number of transactions: {{ number_of_transactions }}</h5>
+                <h5>Last Transaction date: {{ account_last_tran }}</h5>
                 <br>
                 <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#ModalTransactionForm">
                     Enter a transaction
@@ -291,13 +349,13 @@
 <div class="row justify-content-center fluid-resposive">
     <div class="box col-md-11 col-xs-10 holds-table">
         <br>
-            <h4><b>Transaction details</b></h4>
-            <h6><i>Click on a transaction to select it</i></h6>
-            <div class = "table-responsive" id = "table-responsive">
-                <!-- //table contents -->
-            </div>
+        <h4><b>Transaction details</b></h4>
+        <h6><i>Click on a transaction to select it</i></h6>
+        <div class="table-responsive" id="table-responsive">
+            <!-- //table contents -->
+        </div>
     </div>
-        
+
 </div>
 
 
@@ -315,21 +373,24 @@
                     <div class="form-group">
                         <label class="control-label">Enter your account password</label>
                         <div>
-                            <input id = "password_confirm" type="password" class="form-control input-lg" name="amount" value="">
+                            <input id="password_confirm" type="password" class="form-control input-lg" name="amount" value="">
                         </div>
                     </div>
                     <div class="modal-footer">
                         <div>
-                            <button class="btn btn-danger" id="confirm_delete" type="button" >Confirm</button>{% csrf_token %}
+                            <button class="btn btn-danger" id="confirm_delete" type="button">Confirm</button>{% csrf_token %}
                             <button type="button" class="btn btn-primary" data-dismiss="modal">Close</button>
 
                         </div>
                     </div>
                 </form>
             </div>
-        </div><!-- /.modal-content -->
-    </div><!-- /.modal-dialog -->
-</div><!-- /.modal -->
+        </div>
+        <!-- /.modal-content -->
+    </div>
+    <!-- /.modal-dialog -->
+</div>
+<!-- /.modal -->
 
 
 <!-- Modal HTML Markup -->
@@ -345,19 +406,19 @@
                     <div class="form-group">
                         <label class="control-label">Amount</label>
                         <div>
-                            <input id = "amount" type="number" class="form-control input-lg" name="amount" value="">
+                            <input id="amount" type="number" class="form-control input-lg" name="amount" value="">
                         </div>
                     </div>
                     <div class="form-group">
                         <label class="control-label">To/From</label>
                         <div>
-                            <input id = "other" type="text" class="form-control input-lg" name="other">
+                            <input id="other" type="text" class="form-control input-lg" name="other">
                         </div>
                     </div>
                     <div class="form-group">
                         <label class="control-label">Date</label>
                         <div>
-                            <input id = "date" type="date" class="form-control input-lg" name="date">
+                            <input id="date" type="date" class="form-control input-lg" name="date">
                         </div>
                     </div>
                     <div class="form-group">
@@ -371,14 +432,17 @@
                     </div>
                     <div class="form-group">
                         <div>
-                            <button class="btn btn-primary" id="enter" type="button" >Enter</button>{% csrf_token %}
+                            <button class="btn btn-primary" id="enter" type="button">Enter</button>{% csrf_token %}
                         </div>
                     </div>
                 </form>
             </div>
-        </div><!-- /.modal-content -->
-    </div><!-- /.modal-dialog -->
-</div><!-- /.modal -->
+        </div>
+        <!-- /.modal-content -->
+    </div>
+    <!-- /.modal-dialog -->
+</div>
+<!-- /.modal -->
 
 <!-- modal that shows the transaction that was clicked -->
 <div id="myModalTransaction" class="modal fade">
@@ -390,26 +454,26 @@
             <div class="modal-body">
                 <form role="form" method="POST" action="">
                     <input type="hidden" name="_token" value="">
-                    <div class = "form-group">
-                        <label class = "control-label">ID</label>
-                        <label id = "trans_id" class = "control-label"></label>
+                    <div class="form-group">
+                        <label class="control-label">ID</label>
+                        <label id="trans_id" class="control-label"></label>
                     </div>
                     <div class="form-group">
                         <label class="control-label">Amount</label>
                         <div>
-                            <input id = "amount_trans" type="number" class="form-control input-lg" name="amount" value="">
+                            <input id="amount_trans" type="number" class="form-control input-lg" name="amount" value="">
                         </div>
                     </div>
                     <div class="form-group">
                         <label class="control-label">To/From</label>
                         <div>
-                            <input id = "other_trans" type="text" class="form-control input-lg" name="other">
+                            <input id="other_trans" type="text" class="form-control input-lg" name="other">
                         </div>
                     </div>
                     <div class="form-group">
                         <label class="control-label">Date</label>
                         <div>
-                            <input id = "date_trans" type="date" class="form-control input-lg" name="date">
+                            <input id="date_trans" type="date" class="form-control input-lg" name="date">
                         </div>
                     </div>
                     <div class="form-group">
@@ -423,19 +487,22 @@
                     </div>
                     <div class="modal-footer">
                         <div>
-                            <button class="btn btn-primary" id="Edit_transaction" type="button" >Edit</button>{% csrf_token %}
-                            <button class="btn btn-danger" id="Delete_transaction" type="button" >Delete</button>{% csrf_token %}
+                            <button class="btn btn-primary" id="Edit_transaction" type="button">Edit</button>{% csrf_token %}
+                            <button class="btn btn-danger" id="Delete_transaction" type="button">Delete</button>{% csrf_token %}
                             <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
                         </div>
                     </div>
                 </form>
             </div>
-        </div><!-- /.modal-content -->
-    </div><!-- /.modal-dialog -->
-</div><!-- /.modal -->
+        </div>
+        <!-- /.modal-content -->
+    </div>
+    <!-- /.modal-dialog -->
+</div>
+<!-- /.modal -->
 
 <script>
-    function convertTime(time){
+    function convertTime(time) {
         var dateObj = new Date(time)
         var month = dateObj.getUTCMonth() + 1; //months from 1-12
         var day = dateObj.getUTCDate();
@@ -450,9 +517,9 @@
 
 <!-- ajax funtion for adding new transaction  -->
 <script>
-
     //ajax csrf stuff which I dont understand.
     var csrftoken = Cookies.get('csrftoken')
+
     function csrfSafeMethod(method) {
         return (/^(GET|HEAD|OPTIONS|TRACE)$/.test(method));
     }
@@ -464,167 +531,165 @@
         }
     });
 
-    $(document).on('click','#enter',function(e){
+    $(document).on('click', '#enter', function(e) {
         e.preventDefault()
-            
-            var payload = {
-                amount: document.getElementById('amount').value,
-                account:'{{account_name}}',
-                other: document.getElementById('other').value,
-                direction: document.getElementById('direction').checked,
-                date: document.getElementById('date').value
-            }
-            var amount = document.getElementById('amount').value;
+
+        var payload = {
+            amount: document.getElementById('amount').value,
+            account: '{{account_name}}',
+            other: document.getElementById('other').value,
+            direction: document.getElementById('direction').checked,
+            date: document.getElementById('date').value
+        }
+        var amount = document.getElementById('amount').value;
 
 
-            $.ajax({
-                type:'POST',
-                url:'/add_transaction/',
-                data:{
-                    'payload':payload,
-                },
-                // This is processing of what we get back
-                success:function(msg){
-                    var response = msg['mssg']
-                    if(response == 1)
+        $.ajax({
+            type: 'POST',
+            url: '/add_transaction/',
+            data: {
+                'payload': payload,
+            },
+            // This is processing of what we get back
+            success: function(msg) {
+                var response = msg['mssg']
+                if (response == 1)
                     alert('balance in account cannot be negetive, try again')
-                    else if(response == 2)
+                else if (response == 2)
                     alert('transaction date cannot be a future date, try again')
-                    else if(response == 3)
+                else if (response == 3)
                     alert('current transactions makes some of future transactions invalid')
-                    else if(response == 4)
+                else if (response == 4)
                     alert('transaction was successfully saved')
-                    window.location.reload();
-                    // update list 
-                },
-                error:function(){
-                    console.log("Error")
-                }
-                
-            });
-        })
+                window.location.reload();
+                // update list 
+            },
+            error: function() {
+                console.log("Error")
+            }
 
+        });
+    })
 </script>
 
 <!-- ajax script to delete all transactions -->
 <script>
-    $(document).on('click','#confirm_delete',function(e){
+    $(document).on('click', '#confirm_delete', function(e) {
         e.preventDefault()
-            
-            var payload = {
-                password: document.getElementById('password_confirm').value,
-                account: '{{account_name}}'
+
+        var payload = {
+            password: document.getElementById('password_confirm').value,
+            account: '{{account_name}}'
+        }
+
+        $.ajax({
+            type: 'POST',
+            url: '/delete_all_transaction/',
+            data: {
+                'payload': payload,
+            },
+            // This is processing of what we get back
+            success: function(msg) {
+                var response = msg['mssg']
+                if (response == 1) {
+                    alert("Password entered for the user is incorrect!")
+                    window.location.reload();
+                } else if (response == 2) {
+                    alert("Successfully deleted all your transactions and deleted your account!")
+                    window.location.href = "{% url 'home'%}";
+                }
+                // update list 
+            },
+            error: function() {
+                console.log("Error")
             }
 
-            $.ajax({
-                type:'POST',
-                url:'/delete_all_transaction/',
-                data:{
-                    'payload':payload,
-                },
-                // This is processing of what we get back
-                success:function(msg){
-                    var response = msg['mssg']
-                    if(response == 1){
-                        alert("Password entered for the user is incorrect!")
-                        window.location.reload();
-                    }
-                    else if(response == 2){
-                        alert("Successfully deleted all your transactions and deleted your account!")
-                        window.location.href = "{% url 'home'%}";
-                    }
-                    // update list 
-                },
-                error:function(){
-                    console.log("Error")
-                }
-                
-            });
+        });
     })
 </script>
 
 <!-- script for editing a record -->
 <script>
-    $(document).on('click','#Edit_transaction',function(e){
+    $(document).on('click', '#Edit_transaction', function(e) {
         e.preventDefault()
-            
-            var payload = {
-                id: document.getElementById('trans_id').innerHTML,
-                account: '{{account_name}}',
-                amount: document.getElementById('amount_trans').value,
-                other: document.getElementById('other_trans').value,
-                direction: document.getElementById('direction_trans').checked,
-                date: document.getElementById('date_trans').value
+
+        var payload = {
+            id: document.getElementById('trans_id').innerHTML,
+            account: '{{account_name}}',
+            amount: document.getElementById('amount_trans').value,
+            other: document.getElementById('other_trans').value,
+            direction: document.getElementById('direction_trans').checked,
+            date: document.getElementById('date_trans').value
+        }
+
+        $.ajax({
+            type: 'POST',
+            url: '/edit_transaction/',
+            data: {
+                'payload': payload,
+            },
+            // This is processing of what we get back
+            success: function(msg) {
+                var response = msg['mssg']
+                if (response == 1)
+                    alert('balance in account cannot be negetive, try again')
+                else if (response == 2)
+                    alert('transaction date cannot be a future date, try again')
+                else if (response == 3)
+                    alert('current transactions makes some of future transactions invalid')
+                else if (response == 4)
+                    alert('transaction was successfully edited and saved')
+                window.location.reload();
+                // update list 
+            },
+            error: function() {
+                console.log("Error")
             }
 
-            $.ajax({
-                type:'POST',
-                url:'/edit_transaction/',
-                data:{
-                    'payload':payload,
-                },
-                // This is processing of what we get back
-                success:function(msg){
-                    var response = msg['mssg']
-                    if(response == 1)
-                    alert('balance in account cannot be negetive, try again')
-                    else if(response == 2)
-                    alert('transaction date cannot be a future date, try again')
-                    else if(response == 3)
-                    alert('current transactions makes some of future transactions invalid')
-                    else if(response == 4)
-                    alert('transaction was successfully edited and saved')
-                    window.location.reload();
-                    // update list 
-                },
-                error:function(){
-                    console.log("Error")
-                }
-                
-            });
+        });
     })
 </script>
 
 <!-- script for deleting transaction -->
 <script>
-$(document).on('click','#Delete_transaction',function(e){
+    $(document).on('click', '#Delete_transaction', function(e) {
         e.preventDefault()
-            
-            var payload = {
-                id: document.getElementById('trans_id').innerHTML,
-                account: '{{account_name}}',
-                amount: document.getElementById('amount_trans').value,
-                other: document.getElementById('other_trans').value,
-                direction: document.getElementById('direction_trans').checked,
-                date: document.getElementById('date_trans').value
+
+        var payload = {
+            id: document.getElementById('trans_id').innerHTML,
+            account: '{{account_name}}',
+            amount: document.getElementById('amount_trans').value,
+            other: document.getElementById('other_trans').value,
+            direction: document.getElementById('direction_trans').checked,
+            date: document.getElementById('date_trans').value
+        }
+
+        console.log(payload)
+
+        $.ajax({
+            type: 'POST',
+            url: '/delete_transaction/',
+            data: {
+                'payload': payload,
+            },
+            // This is processing of what we get back
+            success: function(msg) {
+                console.log(payload)
+                var response = msg['mssg']
+
+                if (response == 3)
+                    alert('deleting this transactions makes some of future transactions invalid')
+                else if (response == 4)
+                    alert('transaction was successfully deleted')
+                window.location.reload();
+                // update list 
+            },
+            error: function() {
+                console.log("Error")
             }
 
-            console.log(payload)
-
-            $.ajax({
-                type:'POST',
-                url:'/delete_transaction/',
-                data:{
-                    'payload':payload,
-                },
-                // This is processing of what we get back
-                success:function(msg){
-                    console.log(payload)
-                    var response = msg['mssg']
-                    
-                    if(response == 3)
-                    alert('deleting this transactions makes some of future transactions invalid')
-                    else if(response == 4)
-                    alert('transaction was successfully deleted')
-                    window.location.reload();
-                    // update list 
-                },
-                error:function(){
-                    console.log("Error")
-                }
-                
-            });
-        })
+        });
+    })
 </script>
 
 

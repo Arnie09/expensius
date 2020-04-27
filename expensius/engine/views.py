@@ -42,6 +42,9 @@ def home(request, account = None):
     payload['number_of_trans'] = number_pages
     payload['account_bal'] = account_default.available_bal
     payload['account_name'] = account_default.account_name
+    payload['account_last_tran'] = account_default.last_trans
+    payload['number_accounts'] = profile_obj.noAccount
+    payload['isPaid'] = profile_obj.isPaid
     payload['number_of_transactions'] = account_default.no_transac
 
     return render(request, 'expensius/home.html',payload)
@@ -60,7 +63,6 @@ def get_transaction(request):
             transactions = paginator.page(paginator.num_pages)
 
         return render(request, 'expensius/get_transactions.html', {'transactions':transactions})
-
 
 
 @login_required
