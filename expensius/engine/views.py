@@ -3,7 +3,7 @@ from django.contrib.auth.decorators import login_required
 from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
 from .models import Transaction
 from login.models import Account, Profile
-from login.views import account_info
+from login.views import account_info, login_view
 from django.http import JsonResponse
 from datetime import date
 from dateutil.parser import parse
@@ -19,7 +19,11 @@ paginator = None
 def home(request, account = None):
 
     user = request.user
-    profile_obj = Profile.objects.get(user = user)
+    profile_obj = None
+    try:
+        profile_obj = Profile.objects.get(user = user)
+    except:
+        return redirect(login_view)
     account_default = None
     account_objs = Account.objects.filter(username = profile_obj)
     if account == None:
@@ -294,7 +298,6 @@ def delete_all_transaction(request):
         user = request.user
         profile_obj = Profile.objects.get(user = user)
         if user.check_password(password):
-            print(account)
             account_obj = Account.objects.get(account_name = account)
             transactions = Transaction.objects.filter(account = account_obj)
             for transaction in transactions:

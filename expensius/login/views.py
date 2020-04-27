@@ -1,4 +1,5 @@
 from django.shortcuts import render,redirect
+from django.http import JsonResponse
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.models import User
 from django.contrib.auth import (
@@ -103,3 +104,28 @@ def logout_view(request):
 # function that renders the about page
 def about(request):
     return render(request, 'expensius/about.html')
+
+
+# function that manages changing the password
+@login_required
+def change_pass(request):
+    
+    if request.method == "POST":
+        old_password = request.POST.get('payload[password]')
+        new_password = request.POST.get('payload[new_pass]')
+        user = request.user
+        profile_obj = Profile.objects.get(user = user)
+        if user.check_password(old_password):
+            user.set_password(new_password)
+            user.save()
+            Message = 2
+        else:
+            Message = 1
+
+        response = {
+            'mssg':Message
+        }
+
+        return JsonResponse(response)
+
+    return redirect('/')

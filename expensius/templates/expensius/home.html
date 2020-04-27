@@ -105,7 +105,7 @@
     
     .dropbtn {
         color: white !important;
-        padding: 5px;
+        padding: 4px;
         font-size: 16px;
         border: none;
     }
@@ -155,6 +155,89 @@
 </style>
 
 
+<div id="ModalChangePassword" class="modal fade">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Change Account Password</h5>
+            </div>
+            <div class="modal-body">
+                <form role="form" method="POST" action="">
+                    <input type="hidden" name="_token" value="">
+                    <div class="form-group">
+                        <label class="control-label">Enter your old account password: </label>
+                        <div>
+                            <input id="password_old" type="password" class="form-control input-lg" name="amount" value="">
+                        </div>
+                        <br>
+                        <label class="control-label">Enter your new account password: </label>
+                        <div>
+                            <input id="password_new" type="password" class="form-control input-lg" name="amount" value="">
+                        </div>
+                        <br>
+                        <label class="control-label">Confirm your new account password:</label>
+                        <div>
+                            <input id="password_confirm_new" type="password" class="form-control input-lg" name="amount" value="">
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <div>
+                            <button class="btn btn-danger" id="confirm_change_password" type="button">Confirm</button>{% csrf_token %}
+                            <button type="button" class="btn btn-primary" data-dismiss="modal">Close</button>
+
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+        <!-- /.modal-content -->
+    </div>
+    <!-- /.modal-dialog -->
+</div>
+
+<script>
+    $(document).on('click', '#confirm_change_password', function(e) {
+        e.preventDefault()
+
+        var old_pass = document.getElementById('password_old').value
+        var new_pass = document.getElementById('password_new').value
+        var new_pass_confirm = document.getElementById('password_confirm_new').value
+
+        if (new_pass != new_pass_confirm) {
+            alert("Passwords dont match")
+        } else {
+            var payload = {
+                password: old_pass,
+                new_pass: new_pass
+            }
+
+            $.ajax({
+                type: 'POST',
+                url: "{% url 'change_password' %}",
+                data: {
+                    'payload': payload,
+                },
+                // This is processing of what we get back
+                success: function(msg) {
+                    var response = msg['mssg']
+                    if (response == 1) {
+                        alert("Password entered for the user is incorrect!")
+                        window.location.reload();
+                    } else if (response == 2) {
+                        alert("Successfully changed account password")
+                        window.location.href = "{% url 'logout'%}";
+                    }
+                    // update list 
+                },
+                error: function() {
+                    console.log("Error")
+                }
+
+            });
+        }
+    })
+</script>
+
 <!-- navbar  -->
 <nav class="navbar navbar-expand-lg navbar-dark shadow" id="mainNav">
     <div class="container-fluid">
@@ -163,19 +246,18 @@
             <span class="navbar-toggler-icon"></span>
         </button>
         <ul class="navbar-nav ml-auto">
-            <a class="nav-link text-black font-weight-bold" href=""></a>
             <div class="dropdown">
-                <a class="dropbtn collapse navbar-collapse pull-right" id="navbarResponsive">Hi,{{ user.username }}</a>
+                <a class="dropbtn navbar-collapse pull-right" id="navbarResponsive">Hi,{{ user.username }}</a>
                 <div class="dropdown-content">
                     <a>Number of accounts: {{ number_accounts }}</a>
                     <a href="#">Support us!</a>
-                    <a href="#">Change Password</a>
-                    <a href="#">Delete Account</a>
+                    <a href="#" data-toggle="modal" data-target="#ModalChangePassword">Change Password</a>
+                    <a href="#" onClick="deleteAccount()">Delete Account</a>
                 </div>
             </div>
         </ul>
         <ul class="navbar-nav ml-none">
-            <a class="nav-link text-black font-weight-bold" href="{% url 'about' %}">About</a>
+            <a class="nav-link collapse text-black font-weight-bold" href="{% url 'about' %}">About</a>
         </ul>
         <ul class="navbar-nav ml-none">
             <a class="nav-link text-black font-weight-bold" href="{% url 'logout' %}">Logout</a>
