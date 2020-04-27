@@ -14,11 +14,16 @@ response = {}
 paginator = None
 
 @login_required
-def home(request):
+def home(request, account = None):
+
     user = request.user
     profile_obj = Profile.objects.get(user = user)
+    account_default = None
     account_objs = Account.objects.filter(username = profile_obj)
-    account_default = account_objs[0]
+    if account == None:
+        account_default = account_objs[0]
+    else:
+        account_default = Account.objects.get(account_name = account)
     transaction_objects = Transaction.objects.filter(account = account_default).order_by('date')
     page = request.GET.get('page', 1)
     global paginator
@@ -56,7 +61,7 @@ def get_transaction(request):
 
 @login_required
 def add_transacton(request, transaction_obj = None):
-
+    print(transaction_obj)
     # ajax function 
     if request.method =="POST" or transaction_obj is not None:
         
@@ -66,6 +71,7 @@ def add_transacton(request, transaction_obj = None):
         mapper2 = {False:-1,True:1}
         other = None
         direction = None
+        account_obj = None
 
         if transaction_obj is None:
             direction = request.POST.get('payload[direction]')
@@ -73,6 +79,7 @@ def add_transacton(request, transaction_obj = None):
             given_date = parse(request.POST.get('payload[date]')).date()
             other = request.POST.get('payload[other]')
             change = mapper[direction]*float(amount)
+            account_obj = Account.objects.get(account_name = request.POST.get('payload[account]'))
         else:
             direction = transaction_obj.direction
             print("Here",direction)
@@ -80,11 +87,12 @@ def add_transacton(request, transaction_obj = None):
             given_date = transaction_obj.date.date()
             other = transaction_obj.other
             change = mapper2[direction]*float(amount)
+            account_obj = transaction_obj.account
 
         current_date = date.today()
 
         profile = Profile.objects.get(user = user)
-        account_obj = Account.objects.get(username = profile)
+        # account_obj = Account.objects.get(username = profile)
 
         last_balance = None
         flag = 0
@@ -176,14 +184,15 @@ def delete_transaction(request):
         Message = ""
         user = request.user
         id_tran = request.POST.get('payload[id]') 
-        direction = Transaction.objects.filter(transactionID = id_tran)[0].direction
-        amount = Transaction.objects.filter(transactionID = id_tran)[0].amount
-        given_date = Transaction.objects.filter(transactionID = id_tran)[0].date.date()
+        trans_obj = Transaction.objects.filter(transactionID = id_tran)[0]
+        direction = trans_obj.direction
+        amount = trans_obj.amount
+        given_date = trans_obj.date.date()
         current_date = date.today()
         mapper = {False:-1,True:1}
         change = mapper[direction]*float(amount)
         profile_obj = Profile.objects.get(user = user)
-        account_obj = Account.objects.get(username = profile_obj)
+        account_obj = trans_obj.account
         last_balance = None
         flag = 0
         update_future = False

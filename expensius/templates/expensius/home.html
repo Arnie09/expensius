@@ -12,17 +12,17 @@
 
     .box{
         text-align: center;
-        z-index: 0;
+        /* z-index: 0; */
         margin: 0 10px 0 10px;
         box-shadow: 0 5px 15px 2px rgba(0, 0, 0, 0.15);
     }
 
     .box:hover{
         box-shadow: 0 5px 15px 2px rgba(0, 0, 0, 0.2);
-        -webkit-transform: scale(1.005);
+        /* -webkit-transform: scale(1.005);
         -ms-transform: scale(1.005);
         transform: scale(1.005);
-        -webkit-transition: transform 0.2s ease-in-out;
+        -webkit-transition: transform 0.2s ease-in-out; */
     }
 
     .navbar{
@@ -141,13 +141,13 @@
                             <span class="caret"></span></button>
                             <ul class="dropdown-menu">
                               {% for account in account_names %}
-                              <li><a href="#" style="color: #fd746c;" >{{account}}</a></li>
+                             <li><a href="{% url 'home' account=account %}" method="POST" style="color: #fd746c;" >{{account}}</a></li>
                               {% endfor %}
                             </ul>
                     </div>
-                    <button type="button" class="btn btn-default btn-sm add-button">
+                    <a href="{% url 'account' %}" class="btn btn-dft btn-sm add-button">
                         <i class="fas fa-plus"></i>                  
-                    </button>
+                    </a>
                 </div>
 
             </div>
@@ -446,47 +446,7 @@
     }
 </script>
 
-<!-- script that selects the row of data that the user has clicked on -->
-<script>
-    $("#table-transaction").click(function(){   
-        var t = document.getElementById('table-transaction');
-        var rows = t.rows; //rows collection - https://developer.mozilla.org/en-US/docs/Web/API/HTMLTableElement
-		for (var i=0; i<rows.length; i++) {
-			rows[i].onclick = function (event) {
-				//event = event || window.event; // for IE8 backward compatibility
-				//console.log(event, this, this.outerHTML);
-				if (this.parentNode.nodeName == 'THEAD') {
-					return;
-				}
-				var cells = this.cells; //cells collection
-				$("#myModalTransaction").modal('show')
 
-                var date_tran = document.getElementById('date_trans')
-				var date = new Date(cells[0].innerHTML);
-                date_tran.value = date.getFullYear().toString() + '-' + (date.getMonth() + 1).toString().padStart(2, 0) + '-' + date.getDate().toString().padStart(2, 0);
-
-                var with_tran = document.getElementById('other_trans')
-				with_tran.value = cells[1].innerHTML;
-
-                var amount_tran = document.getElementById('amount_trans')
-				amount_tran.value = cells[2].innerHTML;
-				
-                var dir_tran = document.getElementById('direction_trans')
-                var bool = cells[3].innerHTML;
-                if (bool == "True")
-                dir_tran.checked = true;
-                else
-                dir_tran.checked = false;
-
-                var id_tran = document.getElementById('trans_id')
-				id_tran.innerHTML = cells[5].innerHTML;
-
-                
-			};
-		}
-    });
-
-</script>
 
 <!-- ajax funtion for adding new transaction  -->
 <script>
@@ -509,6 +469,7 @@
             
             var payload = {
                 amount: document.getElementById('amount').value,
+                account:'{{account_name}}',
                 other: document.getElementById('other').value,
                 direction: document.getElementById('direction').checked,
                 date: document.getElementById('date').value
@@ -588,6 +549,7 @@
             
             var payload = {
                 id: document.getElementById('trans_id').innerHTML,
+                account: '{{account_name}}',
                 amount: document.getElementById('amount_trans').value,
                 other: document.getElementById('other_trans').value,
                 direction: document.getElementById('direction_trans').checked,
@@ -629,6 +591,7 @@ $(document).on('click','#Delete_transaction',function(e){
             
             var payload = {
                 id: document.getElementById('trans_id').innerHTML,
+                account: '{{account_name}}',
                 amount: document.getElementById('amount_trans').value,
                 other: document.getElementById('other_trans').value,
                 direction: document.getElementById('direction_trans').checked,

@@ -1,7 +1,8 @@
 from . import views
-from django.urls import path
+from django.urls import path,re_path
 
 urlpatterns = [
+    path('/?P<str:account>/',views.home, name= 'home'),
     path('',views.home, name= 'home'),
     path('add_transaction/', views.add_transacton, name='transaction'),
     path('delete_transaction/', views.delete_transaction, name='delete_transaction'),

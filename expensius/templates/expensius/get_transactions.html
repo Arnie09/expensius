@@ -70,3 +70,47 @@
         {% endif %}
     </div>
 </div>
+
+
+<!-- script that selects the row of data that the user has clicked on -->
+<script>
+    $("#table-transaction").click(function(){   
+        console.log("I was clicked")
+        var t = document.getElementById('table-transaction');
+        var rows = t.rows; //rows collection - https://developer.mozilla.org/en-US/docs/Web/API/HTMLTableElement
+		for (var i=0; i<rows.length; i++) {
+			rows[i].onclick = function (event) {
+				//event = event || window.event; // for IE8 backward compatibility
+				//console.log(event, this, this.outerHTML);
+				if (this.parentNode.nodeName == 'THEAD') {
+					return;
+				}
+				var cells = this.cells; //cells collection
+				$("#myModalTransaction").modal('show')
+
+                var date_tran = document.getElementById('date_trans')
+				var date = new Date(cells[0].innerHTML);
+                date_tran.value = date.getFullYear().toString() + '-' + (date.getMonth() + 1).toString().padStart(2, 0) + '-' + date.getDate().toString().padStart(2, 0);
+
+                var with_tran = document.getElementById('other_trans')
+				with_tran.value = cells[1].innerHTML;
+
+                var amount_tran = document.getElementById('amount_trans')
+				amount_tran.value = cells[2].innerHTML;
+				
+                var dir_tran = document.getElementById('direction_trans')
+                var bool = cells[3].innerHTML;
+                if (bool == "True")
+                dir_tran.checked = true;
+                else
+                dir_tran.checked = false;
+
+                var id_tran = document.getElementById('trans_id')
+				id_tran.innerHTML = cells[5].innerHTML;
+
+                
+			};
+		}
+    });
+
+</script>
