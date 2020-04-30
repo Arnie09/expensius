@@ -22,5 +22,6 @@ urlpatterns = [
     path('', include('engine.urls'), name = "home"),
     path('', include('login.urls'), name = "login"),
     path('', include('login.urls'), name = "logout"),
+    path('', include('login.urls'), name = "change_password"),
     path('oauth/', include('social_django.urls', namespace='social')), 
 ]

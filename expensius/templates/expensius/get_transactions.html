@@ -1,0 +1,116 @@
+
+<div class = "complete-table">
+    <table class="table table-striped" id = "table-transaction">
+        <thead>
+            <tr>
+            <!-- <th scope="col">#</th> -->
+            <th scope="col">Transaction Date</th>
+            <th scope="col">Transaction with</th>
+            <th scope="col">Transaction Amount</th>
+            <th scope="col">CR/DB</th>
+            <th scope="col">Amount in accnt.</th>
+            <th scope="col">ID</th>
+            </tr>
+        </thead>
+
+        {% for transaction in transactions %}
+        <!-- <tbody> -->
+            <tr>
+                <td class="trans_date">{{transaction.date|date}}</td>
+                <td>{{transaction.other}}</td>
+                <td>{{transaction.amount}}</td>
+                <td>{{transaction.direction}}</td>
+                <td class="trans_amount">{{transaction.amount_accnt}}</td>
+                <td>{{transaction.transactionID}}</td>
+            </tr>
+        <!-- </tbody> -->
+        {% endfor %}
+        
+    </table>
+    <div class = "paginator">
+        {% if transactions.has_other_pages %}
+        <nav aria-label="Page navigation example">
+            <ul class="pagination">
+                {% if transactions.has_previous %}
+            <li class="page-item">
+                <a class="page-link" href="#" onclick="getTransaction({{ transactions.previous_page_number }})" aria-label="Previous">
+                <span aria-hidden="true">&laquo;</span>
+                <span class="sr-only">Previous</span>
+                </a>
+            </li>
+            {% else %}
+            <li class="disabled">
+                <a class="page-link" href="#" aria-label="Previous">
+                <span aria-hidden="true">&laquo;</span>
+                <span class="sr-only">Previous</span>
+                </a>
+            </li>
+            {% endif %}
+            <!-- {% for i in transactions.paginator.page_range %}
+                <li class="page-item"><a class="page-link" href="#" onclick="getTransaction({{ i }})">{{i}}</a></li>
+            {% endfor %} -->
+
+            {% if transactions.has_next %}
+            <li class="page-item">
+                <a class="page-link" href="#" onclick="getTransaction({{ transactions.next_page_number }})" aria-label="Next">
+                <span aria-hidden="true">&raquo;</span>
+                <span class="sr-only">Next</span>
+                </a>
+            </li>
+            {% else %}
+            <li class="disabled">
+                <a class="page-link" href="#" aria-label="Next">
+                <span aria-hidden="true">&raquo;</span>
+                <span class="sr-only">Next</span>
+                </a>
+            </li>
+            {% endif %}
+            </ul>
+        </nav>
+        {% endif %}
+    </div>
+</div>
+
+
+<!-- script that selects the row of data that the user has clicked on -->
+<script>
+    $("#table-transaction").click(function(){   
+        console.log("I was clicked")
+        var t = document.getElementById('table-transaction');
+        var rows = t.rows; //rows collection - https://developer.mozilla.org/en-US/docs/Web/API/HTMLTableElement
+		for (var i=0; i<rows.length; i++) {
+			rows[i].onclick = function (event) {
+				//event = event || window.event; // for IE8 backward compatibility
+				//console.log(event, this, this.outerHTML);
+				if (this.parentNode.nodeName == 'THEAD') {
+					return;
+				}
+				var cells = this.cells; //cells collection
+				$("#myModalTransaction").modal('show')
+
+                var date_tran = document.getElementById('date_trans')
+				var date = new Date(cells[0].innerHTML);
+                date_tran.value = date.getFullYear().toString() + '-' + (date.getMonth() + 1).toString().padStart(2, 0) + '-' + date.getDate().toString().padStart(2, 0);
+
+                var with_tran = document.getElementById('other_trans')
+				with_tran.value = cells[1].innerHTML;
+
+                var amount_tran = document.getElementById('amount_trans')
+				amount_tran.value = cells[2].innerHTML;
+				
+                var dir_tran = document.getElementById('direction_trans')
+                var bool = cells[3].innerHTML;
+                if (bool == "True")
+                dir_tran.checked = true;
+                else
+                dir_tran.checked = false;
+
+                var id_tran = document.getElementById('trans_id')
+				id_tran.innerHTML = cells[5].innerHTML;
+
+                
+			};
+		}
+    });
+
+</script>
