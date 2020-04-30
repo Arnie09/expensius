@@ -152,9 +152,21 @@
     .dropdown:hover .dropbtn {
         background-color: #ff443a;
     }
+    
+    .search {
+        position: relative;
+        top: 50%;
+        transform: translateY(-50%);
+    }
+    
+    .search_label {
+        font-weight: 10;
+        opacity: 70%;
+    }
 </style>
 
 
+<!-- modal to change the user password -->
 <div id="ModalChangePassword" class="modal fade">
     <div class="modal-dialog" role="document">
         <div class="modal-content">
@@ -195,6 +207,7 @@
     <!-- /.modal-dialog -->
 </div>
 
+<!-- Ajax script to change password -->
 <script>
     $(document).on('click', '#confirm_change_password', function(e) {
         e.preventDefault()
@@ -238,6 +251,78 @@
     })
 </script>
 
+<!-- modal to delete account -->
+<div id="ModalDeleteAccount" class="modal fade">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Delete Profile</h5>
+            </div>
+            <div class="modal-body">
+                <form role="form" method="POST" action="">
+                    <input type="hidden" name="_token" value="">
+                    <div class="form-group">
+                        <label class="control-label">Enter your account password: </label>
+                        <div>
+                            <input id="password_accnt_del" type="password" class="form-control input-lg" name="amount" value="">
+                        </div>
+                        <br>
+                    </div>
+                    <div class="modal-footer">
+                        <div>
+                            <button class="btn btn-danger" id="confirm_profile_del" type="button">Confirm</button>{% csrf_token %}
+                            <button type="button" class="btn btn-primary" data-dismiss="modal">Close</button>
+
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+        <!-- /.modal-content -->
+    </div>
+    <!-- /.modal-dialog -->
+</div>
+
+<!-- Ajax script to delete the user account -->
+<script>
+    $(document).on('click', '#confirm_profile_del', function(e) {
+        e.preventDefault()
+
+        var pass = document.getElementById('password_accnt_del').value
+
+
+        var payload = {
+            password: pass,
+        }
+
+        $.ajax({
+            type: 'POST',
+            url: "{% url 'delete_profile' %}",
+            data: {
+                'payload': payload,
+            },
+            // This is processing of what we get back
+            success: function(msg) {
+                var response = msg['mssg']
+                if (response == 1) {
+                    alert("Password entered for the user is incorrect!")
+                    window.location.reload();
+                } else if (response == 2) {
+                    alert("Successfully deleted your profile")
+                    window.location.href = "{% url 'register'%}";
+                }
+                // update list 
+            },
+            error: function() {
+                console.log("Error")
+            }
+
+        });
+
+    })
+</script>
+
+
 <!-- navbar  -->
 <nav class="navbar navbar-expand-lg navbar-dark shadow" id="mainNav">
     <div class="container-fluid">
@@ -247,12 +332,12 @@
         </button>
         <ul class="navbar-nav ml-auto">
             <div class="dropdown">
-                <a class="dropbtn navbar-collapse pull-right" id="navbarResponsive">Hi,{{ user.username }}</a>
+                <a class="dropbtn navbar-collapse pull-right" id="navbarResponsive">Hi,{{ user.username }} </a>
                 <div class="dropdown-content">
                     <a>Number of accounts: {{ number_accounts }}</a>
                     <a href="#">Support us!</a>
                     <a href="#" data-toggle="modal" data-target="#ModalChangePassword">Change Password</a>
-                    <a href="#" onClick="deleteAccount()">Delete Account</a>
+                    <a href="#" data-toggle="modal" data-target="#ModalDeleteAccount">Delete Account</a>
                 </div>
             </div>
         </ul>
@@ -268,6 +353,55 @@
 </nav>
 <br>
 <br>
+
+<!-- modal to search Transactions  -->
+<div id="ModalSearch" class="modal fade">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Search Transactions</h5>
+            </div>
+            <div class="modal-body">
+                <form role="form" method="POST" action="{% url 'search_transaction' %}">
+                    {% csrf_token %}
+                    <input type="hidden" name="account" value="{{account_name}}" />
+                    <div class="form-group">
+                        <label class="control-label">Enter the to/from you had the transaction with. Leave blank to search for all </label>
+                        <div>
+                            <input id="search_asso" type="text" class="form-control input-lg" name="search_other">
+                        </div>
+                        <br>
+
+                        <label class="control-label">Amount Greater than </label>
+                        <div>
+                            <input id="search_gt" type="number" class="form-control input-lg" name="greater_than">
+                        </div>
+                        <label class="control-label">Amount Less than </label>
+                        <div>
+                            <input id="search_lt" type="number" class="form-control input-lg" name="smaller_than">
+                        </div>
+                        <br>
+                        <label class="control-label">Debit/Credit: (Leave blank to search for all)</label>
+                        <select class="form-control" name="direction">
+                            <option>None</option>
+                            <option>Credit</option>
+                            <option>Debit</option>
+                        </select>
+                    </div>
+                    <div class="modal-footer">
+                        <div>
+                            <button class="btn btn-dft" type="submit">Confirm</button>
+                            <button type="button" class="btn btn-primary" data-dismiss="modal">Close</button>
+
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+        <!-- /.modal-content -->
+    </div>
+    <!-- /.modal-dialog -->
+</div>
 
 <!-- section for searching  -->
 <div class="row justify-content-center fluid-resposive">
@@ -290,7 +424,11 @@
                 </div>
 
             </div>
-            <div class="box col-md-8 col-xs-12 right-side holds-graphs justify-content-center">
+            <div class="box col-md-8 col-xs-12 right-side holds-search justify-content-center">
+                <!-- Search option comes here  -->
+                <div id="search_button" class="search" data-toggle="modal" data-target="#ModalSearch">
+                    <h4 class="search_label">Search</h4>
+                </div>
 
             </div>
         </div>

@@ -31,3 +31,8 @@ profile ----> Account1 ----> Transaction1, Transaction4.
         ----> Account2 ----> Transaction2, Transaction5.
         |
         ____> Account3 ----> Transaction3, Transaction6.
+
+
+Transactions will be searched based on the following parameters
+
+GT/LT, Amount, other, credit/debit

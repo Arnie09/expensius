@@ -1,0 +1,78 @@
+{% extends "expensius/base.html" %} {% load static %} {% block content %}
+<!-- chart js  -->
+<script src="https://cdn.jsdelivr.net/npm/chart.js@2.9.3/dist/Chart.min.js"></script>
+<!-- js.cookie -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/js-cookie/2.2.1/js.cookie.js"></script>
+<script src="https://kit.fontawesome.com/86561c2b48.js" crossorigin="anonymous"></script>
+
+<style>
+    .box {
+        text-align: center;
+        margin: 0 10px 0 10px;
+        box-shadow: 0 5px 15px 2px rgba(0, 0, 0, 0.15);
+    }
+    
+    .box:hover {
+        box-shadow: 0 5px 15px 2px rgba(0, 0, 0, 0.2);
+    }
+    
+    .navbar {
+        background: #fd746c;
+        /* fallback for old browsers */
+        background: -webkit-linear-gradient(to right, #ff9068, #fd746c);
+        /* Chrome 10-25, Safari 5.1-6 */
+        background: linear-gradient(to right, #ff9068, #fd746c);
+        /* W3C, IE 10+/ Edge, Firefox 16+, Chrome 26+, Opera 12+, Safari 7+ */
+        /* W3C, IE 10+/ Edge, Firefox 16+, Chrome 26+, Opera 12+, Safari 7+ */
+    }
+    
+    .navbar-brand {
+        color: white !important;
+        font-weight: bolder !important;
+    }
+    
+    .nav-link {
+        color: white !important;
+        font-weight: 100 !important;
+        align-self: end;
+    }
+    
+    .account-details {
+        height: auto;
+        margin-bottom: 50px;
+    }
+    
+    .h4 {
+        margin: 10px;
+        margin-top: 50px;
+    }
+</style>
+
+<nav class="navbar navbar-expand-lg navbar-dark shadow" id="mainNav">
+    <div class="container-fluid">
+        <a class="navbar-brand" href="">Expensius</a>
+        <button class="navbar-toggler navbar-toggler-right" type="button" data-toggle="collapse" data-target="#navbarResponsive" aria-controls="navbarResponsive" aria-expanded="false" aria-label="Toggle navigation">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+        <ul class="navbar-nav ml-auto">
+            <a class="nav-link navbar-collapse pull-right" id="navbarResponsive">Hi,{{ user.username }} </a>
+        </ul>
+        <ul class="navbar-nav ml-none">
+            <a class="nav-link collapse text-black font-weight-bold" href="{% url 'about' %}">About</a>
+        </ul>
+        <ul class="navbar-nav ml-none">
+            <a class="nav-link text-black font-weight-bold" href="{% url 'logout' %}">Logout</a>
+        </ul>
+
+    </div>
+    </div>
+</nav>
+<br>
+<br>
+<div class="results box">
+    {% if show %} {% include "expensius/get_transactions.html" %} {% else %}
+    <h6> No results to show! :( </h6>
+    {% endif %}
+</div>
+
+{% endblock %}

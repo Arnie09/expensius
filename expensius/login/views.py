@@ -129,3 +129,32 @@ def change_pass(request):
         return JsonResponse(response)
 
     return redirect('/')
+
+
+# function that manages changing the password
+@login_required
+def delete_profile(request):
+    if request.method == "POST":
+        password = request.POST.get('payload[password]')
+        user = request.user
+        profile_obj = Profile.objects.get(user = user)
+        if user.check_password(password):
+            accounts = Account.objects.filter(username = profile_obj)
+
+            for acc in accounts:
+                Transaction.objects.filter(account = acc).delete()
+
+            accounts.delete()
+
+            Profile.objects.filter(user = user).delete()
+            User.objects.get(username = user.username).delete()
+            Message = 2
+        else:
+            Message = 1
+
+        response = {
+            'mssg':Message
+        }
+
+        return JsonResponse(response)
+    return redirect('/')

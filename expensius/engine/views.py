@@ -316,3 +316,53 @@ def delete_all_transaction(request):
         return JsonResponse(response)
 
     return redirect('/')
+
+@login_required
+def search_transaction(request):
+
+    if request.method == "POST":
+
+        user = request.user
+        profile_obj = Profile.objects.get(user = user)
+        account = request.POST.get('account')
+        accnt_obj = Account.objects.get(account_name = account, username = profile_obj)
+        transaction_obj = Transaction.objects.filter(account = accnt_obj)
+
+        try:
+            amt_ub = request.POST.get('smaller_than')
+            transaction_obj = transaction_obj.filter(amount__lte = amt_ub )
+        except:
+            pass
+
+        try:
+            amt_lb = request.POST.get('greater_than')
+            transaction_obj = transaction_obj.filter(amount__gte = amt_lb)
+        except:
+            pass
+        
+        try:
+            other = request.POST.get('search_other')
+            if other != "":
+                transaction_obj = transaction_obj.filter(other = other)
+        except:
+            pass
+
+        try:
+            direction = request.POST.get("direction")
+            if direction == "Credit" or direction == "Debit":
+                direc = False if direction == "Debit" else True
+                transaction_obj = transaction_obj.filter(direction = direc)
+        except:
+            pass
+        
+        show = True if len(transaction_obj)>0 else False
+        
+        response = {
+            'account' : accnt_obj.account_name,
+            'transactions' : transaction_obj,
+            'show':show
+        }
+        
+        return render(request, 'expensius/search.html', response)
+
+    return redirect('/')
