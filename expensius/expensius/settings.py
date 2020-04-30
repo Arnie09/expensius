@@ -93,7 +93,7 @@ WSGI_APPLICATION = 'expensius.wsgi.application'
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.postgresql_psycopg2',
-        'NAME': 'expensius',
+        'NAME': 'expensius_dev',
         'USER': 'adminarnab',
         'PASSWORD': 'Hello1234',
         'HOST': 'localhost',
