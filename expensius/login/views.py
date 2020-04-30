@@ -42,9 +42,9 @@ def register_view(request):
         user.save()
         new_user = authenticate(username = user.username, password = password)
         login(request,user,backend='django.contrib.auth.backends.ModelBackend')
-        Profile.objects.create(
-            user = user,
-        )
+        profile_obj = Profile()
+        profile_obj.user = user
+        profile_obj.save()
         if next:
             return redirect(next)
         return redirect('account/')
