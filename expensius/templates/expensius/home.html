@@ -163,6 +163,26 @@
         font-weight: 10;
         opacity: 70%;
     }
+    
+    @media (max-width:1024px) {
+        .holds-search {
+            margin-top: 5%;
+            margin-left: 10%;
+            margin-right: 10%;
+        }
+        .account-selector {
+            width: fit-content;
+        }
+        .chart-container {
+            height: fit-content !important;
+        }
+        .del-transactions-button {
+            margin-bottom: 5%;
+        }
+        .nav-link {
+            margin-right: 1% !important;
+        }
+    }
 </style>
 
 
@@ -327,12 +347,12 @@
 <nav class="navbar navbar-expand-lg navbar-dark shadow" id="mainNav">
     <div class="container-fluid">
         <a class="navbar-brand" href="">Expensius</a>
-        <button class="navbar-toggler navbar-toggler-right" type="button" data-toggle="collapse" data-target="#navbarResponsive" aria-controls="navbarResponsive" aria-expanded="false" aria-label="Toggle navigation">
-            <span class="navbar-toggler-icon"></span>
+        <!-- <button class="navbar-toggler navbar-toggler-right" type="button" data-target="#navbarResponsive" aria-controls="navbarResponsive" aria-expanded="false" aria-label="Toggle navigation"> -->
+        <!-- <span class="navbar-toggler-icon"></span> -->
         </button>
         <ul class="navbar-nav ml-auto">
             <div class="dropdown">
-                <a class="dropbtn navbar-collapse pull-right" id="navbarResponsive">Hi,{{ user.username }} </a>
+                <a class="dropbtn nav-link navbar-collapse pull-right" id="navbarResponsive">Hi,{{ user.username }} </a>
                 <div class="dropdown-content">
                     <a>Number of accounts: {{ number_accounts }}</a>
                     <a href="#">Support us!</a>
@@ -550,7 +570,7 @@
                 </button>
                 <br>
                 <br>
-                <button type="button" class="btn btn-dft" data-toggle="modal" data-target="#ModalTransactionDeleteForm">
+                <button type="button" class="btn btn-dft del-transactions-button" data-toggle="modal" data-target="#ModalTransactionDeleteForm">
                     Delete all transactions
                 </button>
 
