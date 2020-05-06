@@ -36,11 +36,11 @@ The serach dialog looks somewhat like this:
 * Django
 * Postgres
 * ChartJs
-* Js (vanilla+Jquery), html, css (I used a bit of bootstrap frame work as well)
+* Js (vanilla+JQuery), html, css (I used a bit of bootstrap frame work as well)
 
-The website has been hosted on heroku on the free tier. Sometimes I got some wierd issues when Chart.js was not acting properly. A simple refresh fixes such issues. I have tried to optimise the website for mobile devices and tried to make as responsive as possible using the limited css knowledge that I have. In case you find any bugs, feel free to contact me on my email - arnabchanda964@gmail.com 
+The website has been hosted on Heroku on the free tier. Sometimes I got some wierd issues when Chart.js was not acting properly. A simple refresh fixes such issues. I have tried to optimise the website for mobile devices and tried to make as responsive as possible using the limited css knowledge that I have. In case you find any bugs, feel free to contact me on my email - arnabchanda964@gmail.com 
 
 
 #### Side note:
 
-I liked where I got with this project with the little time I invested for this. There are several things I wish were better in this project - like a email authentication, forgot password feature. I also wanted to add OAuth from other social media's like Github, Google, facebook, but I skipped over them as these were not much relevant to the proper working of the website. 
+I liked where I got with this project with the little time I invested for this. There are several things I wish were better in this project - like a email authentication, forgot password feature. I also wanted to add OAuth from other social media's like Github, Google, facebook, but I skipped over them as these were not much relevant to the proper working of the website. Maybe I'll implement those features someday! 
